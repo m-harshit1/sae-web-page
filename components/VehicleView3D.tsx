@@ -18,6 +18,11 @@ function ActualGLTFModel({ explodedFactor, activeSubsystem }: { explodedFactor: 
     } else {
       modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, 0, 0.1);
     }
+
+    // Interactive explosion displacement & camera depth
+    const targetScale = 1.5 + explodedFactor * 0.25;
+    modelRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+    modelRef.current.position.y = THREE.MathUtils.lerp(modelRef.current.position.y, -1 + explodedFactor * 0.5, 0.1);
   });
 
   return (
@@ -151,9 +156,12 @@ export default function VehicleView3D({ activeSubsystem = 'overview' }: { active
       <div className="absolute top-6 left-6 pointer-events-none">
         <div className="font-heading font-black text-2xl text-white uppercase tracking-tighter">B-26 Assembly</div>
         <div className="font-mono text-[10px] text-slate-500 mt-2 flex flex-col gap-1">
-          <span>WebGL Render Pipeline Active</span>
-          <span>Polygons: ~1.2M (Decimated)</span>
-          <span>Draco Compression: Enabled</span>
+          <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            SolidWorks AP203 CAD Online
+          </span>
+          <span>Mesh Faces: 107,556 Polygons</span>
+          <span>Source: BAJA_FULL_ASSEMBB;Y.STEP (257 MB)</span>
         </div>
       </div>
     </div>

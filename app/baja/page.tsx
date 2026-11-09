@@ -3,6 +3,7 @@
 import React, { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Download } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Html } from '@react-three/drei';
 import VehicleMeshPipeline from '@/components/3d/VehicleMeshPipeline';
@@ -38,8 +39,19 @@ export default function BajaWorkspace3D() {
             <span className="font-bold tracking-widest text-sm uppercase hidden sm:inline">B-26 CAD CORE // RENDERING MATRIX</span>
           </div>
         </div>
-        <div className="text-gray-400 hidden sm:block">
-          FOCUS AXIS: <span className="text-[#0EA5E9] uppercase font-bold">{activeSubtab}</span>
+        <div className="flex items-center gap-4">
+          <div className="text-gray-400 hidden md:block">
+            FOCUS AXIS: <span className="text-[#0EA5E9] uppercase font-bold">{activeSubtab}</span>
+          </div>
+          <a
+            href="/api/cad/download"
+            download="BAJA_B26_FULL_ASSEMBLY.STEP"
+            className="px-3 py-1.5 bg-[#F97316]/20 hover:bg-[#F97316] text-[#F97316] hover:text-white border border-[#F97316]/40 rounded transition-all flex items-center gap-1.5 font-bold uppercase tracking-wider"
+            title="Download full 257 MB SolidWorks AP203 CAD STEP model"
+          >
+            <Download size={13} />
+            <span>Download CAD (.STEP)</span>
+          </a>
         </div>
       </header>
 

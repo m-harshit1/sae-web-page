@@ -40,3 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 sae-web-page.zip
+
+# Large CAD raw files (>100MB exceeds GitHub push limit; use WebGL-optimized .glb on site)
+*.STEP
+*.step
+*.STP
+*.stp

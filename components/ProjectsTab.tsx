@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { 
-  ChevronRight, CheckCircle, Flame, Activity
+  ChevronRight, CheckCircle, Flame, Activity, Download
 } from 'lucide-react';
 import { achievementsData } from '@/data/achievements';
 import dynamic from 'next/dynamic';
@@ -318,18 +318,33 @@ export default function ProjectsTab() {
             {activeSubTab === "3d_view" && (
               <div className="pt-4 animate-fadeIn space-y-4">
                 
-                {/* Link to the new Fullscreen Workspace */}
+                {/* Link to the new Fullscreen Workspace & CAD Download */}
                 <div className="w-full bg-apex-red/10 border border-apex-red/30 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div>
                     <h4 className="font-heading font-black text-white text-lg uppercase flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-apex-red animate-pulse" />
-                      Emergent 3D Workspace
+                      Emergent 3D Workspace &amp; SolidWorks CAD
                     </h4>
-                    <p className="text-slate-400 font-mono text-[10px] sm:text-xs uppercase mt-1">Launch the dedicated full-screen WebGL application builder</p>
+                    <p className="text-slate-400 font-mono text-[10px] sm:text-xs uppercase mt-1">
+                      Explore interactive WebGL CAD or download full SolidWorks AP203 STEP assembly (257 MB)
+                    </p>
                   </div>
-                  <a href="/baja" className="px-6 py-3 bg-apex-red text-white font-bold font-mono text-xs uppercase rounded hover:bg-apex-red/80 transition-colors whitespace-nowrap shrink-0 text-center">
-                    Launch Workspace ↗
-                  </a>
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <a 
+                      href="/api/cad/download" 
+                      download="BAJA_B26_FULL_ASSEMBLY.STEP"
+                      className="flex-1 sm:flex-initial px-4 py-3 bg-[#1E2025] hover:bg-white/10 text-slate-200 border border-white/20 font-bold font-mono text-xs uppercase rounded transition-colors whitespace-nowrap flex items-center justify-center gap-2 text-center cursor-pointer"
+                    >
+                      <Download size={14} className="text-torque-orange" />
+                      Download CAD (.STEP)
+                    </a>
+                    <a 
+                      href="/baja" 
+                      className="flex-1 sm:flex-initial px-6 py-3 bg-apex-red text-white font-bold font-mono text-xs uppercase rounded hover:bg-apex-red/80 transition-colors whitespace-nowrap shrink-0 text-center cursor-pointer"
+                    >
+                      Launch Workspace ↗
+                    </a>
+                  </div>
                 </div>
 
                 <div className="border border-white/5 rounded-xl overflow-hidden bg-carbon-900/50 p-2">
