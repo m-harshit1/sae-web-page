@@ -1,0 +1,35 @@
+[
+  {
+    "id": 1,
+    "title": "B-26 ATV Completes Dynamic Brake Shakedown at Orvakal Track",
+    "excerpt": "Our engineering leads verified brake lock reliability and simultaneous wheel locking vectors during dynamic testing at the Orvakal test circuit.",
+    "content": "The IIITDM Kurnool SAEINDIA collegiate team completed its dynamic shakedown trials for the B-26 ATV. The primary focus of the test was validating the braking kinematics calculated under our hydraulic line-pressure calculations.\n\nWith a target deceleration value set to 7.848 m/s² (~0.8g), driver Harshit Kumar Mishra executed high-velocity straight-line stops from speeds exceeding 40 km/h. High-speed cameras verified instantaneous four-wheel lockup on clay terrain. Thermal indicators on the SS410 stainless steel rotors recorded peak contact temperatures of 180°C, well within the safe structural bounds determined during our initial finite element simulations in ANSYS.\n\nSuspension parameters were also evaluated. The double-wishbone linkages demonstrated reliable jounce travel margins, and zero deflection was observed along the steering rack mounting braces.",
+    "category": "Testing",
+    "author": "Vineet Sharma (Tech Head)",
+    "date": "May 28, 2026",
+    "lastUpdated": "May 28, 2026",
+    "readTime": "4 min read"
+  },
+  {
+    "id": 2,
+    "title": "AWIM Program Expands: 3 Rural Schools Adopted in Kurnool District",
+    "excerpt": "SAE collegiate mentors successfully deployed gravity and jet propulsion science kits, mentoring over 80 elementary school children.",
+    "content": "Under our commitment to corporate social responsibility (CSR) and community outreach, the SAEINDIA collegiate chapter at IIITDM Kurnool has adopted three rural schools in the Orvakal district segment.\n\nOur mentors hosted AWIM (A World In Motion) JetToy and Skimmer workshops, teaching primary physical laws and aerospace concepts to children. Students assembled physical models using air-pressure balloon thrusters, plotting distance grids to analyze velocity decay rates. Special thanks to our Faculty Advisor, Dr. S. Anand Kumar, for coordinating logistics with local school boards.",
+    "category": "AWIM Outreach",
+    "author": "Sneha Nair (PR Coordinator)",
+    "date": "June 02, 2026",
+    "lastUpdated": "June 02, 2026",
+    "readTime": "3 min read"
+  },
+  {
+    "id": 3,
+    "title": "IIITDM Kurnool SAEINDIA Collegiate Chapter Inducts Class of 2026 Board",
+    "excerpt": "The chapter completed annual elections, appointing new subteam captains, finance managers, and outreach leads for the fiscal campaign.",
+    "content": "We are excited to announce the official board appointments for the upcoming fiscal campaign. Following nominations reviewed by Faculty Co-supervisors, the executive board is tasked with preparing budget allocation sheets and managing sponsor relations.\n\nHarshit Kumar Mishra is re-appointed as President, with N M Roshanth serving as Vice-President. The team's primary milestone is validating design rules for a planned transition into the Formula Student EV category by winter 2027.",
+    "category": "Announcements",
+    "author": "Executive Board",
+    "date": "June 10, 2026",
+    "lastUpdated": "June 12, 2026",
+    "readTime": "2 min read"
+  }
+]

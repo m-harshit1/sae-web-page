@@ -1,0 +1,16 @@
+{
+  "name": "SAEINDIA Collegiate Chapter IIITDM Kurnool",
+  "short_name": "SAEINDIA IIITDMK",
+  "description": "Collegiate chapter portal of the SAEINDIA Collegiate Club at IIITDM Kurnool.",
+  "start_url": "/?tab=home",
+  "display": "standalone",
+  "background_color": "#131519",
+  "theme_color": "#00828A",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+      }
+    ]
+}

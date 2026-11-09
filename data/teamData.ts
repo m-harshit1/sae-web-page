@@ -1,0 +1,57 @@
+export interface TeamMember {
+  name: string;
+  role: string;
+  subteam: string;
+  image?: string;
+  email?: string;
+  linkedin?: string;
+  initials: string;
+}
+
+export const facultyAdvisors: TeamMember[] = [
+  { name: "Dr. S. Anand Kumar", role: "Primary Faculty Advisor", subteam: "Academic Advisory", initials: "AK", email: "anand@iiitk.ac.in" },
+  { name: "Dr. Pankaj Kaushik", role: "Faculty Co-supervisor", subteam: "Academic Advisory", initials: "PK", email: "pankaj@iiitk.ac.in" }
+];
+
+export const executiveBoard: TeamMember[] = [
+  { name: "Harshit Kumar Mishra", role: "Club President / Powertrain Lead", subteam: "Executive Board", initials: "HM", email: "harshit.mishra@iiitk.ac.in", linkedin: "https://linkedin.com" },
+  { name: "N M Roshanth", role: "Club Vice-President / Drivetrain Lead", subteam: "Executive Board", initials: "NR", email: "roshanth.nm@iiitk.ac.in", linkedin: "https://linkedin.com" }
+];
+
+export const coreLeadership: TeamMember[] = [
+  { name: "Vineet Sharma", role: "Technical Head / Suspension Lead", subteam: "Core Tech Leadership", initials: "VS", email: "vineet.sharma@iiitk.ac.in", linkedin: "https://linkedin.com" }
+];
+
+export const subsystemLeads: TeamMember[] = [
+  { name: "V. Akash", role: "Chassis & Roll Cage Lead", subteam: "Chassis", initials: "VA", email: "akash.v@iiitk.ac.in" },
+  { name: "Vineet Sharma", role: "Suspension & Kinematics Lead", subteam: "Suspension", initials: "VS", email: "vineet.sharma@iiitk.ac.in" },
+  { name: "N M Roshanth", role: "Drivetrain & Powertrain Lead", subteam: "Powertrain", initials: "NR", email: "roshanth.nm@iiitk.ac.in" },
+  { name: "Samarth Sakhale", role: "Brakes & Steering Lead", subteam: "Brakes", initials: "SS", email: "samarth.sakhale@iiitk.ac.in" },
+  { name: "Sneha Nair", role: "Electrical & DAQ Lead", subteam: "Electrical", initials: "SN", email: "sneha.nair@iiitk.ac.in" }
+];
+
+export const managementTeam: TeamMember[] = [
+  { name: "Priya Patel", role: "Sponsorship & Corporate Relations Lead", subteam: "Management", initials: "PP", email: "priya.patel@iiitk.ac.in" },
+  { name: "Aman Sharma", role: "Finance & Inventory Officer", subteam: "Management", initials: "AS", email: "aman.sharma@iiitk.ac.in" },
+  { name: "Rohan Verma", role: "Public Relations & Media Manager", subteam: "Management", initials: "RV", email: "rohan.verma@iiitk.ac.in" }
+];
+
+export interface Alumnus {
+  name: string;
+  batch: string;
+  company: string;
+  position: string;
+  location: string;
+  linkedin: string;
+  team: string;
+  initials: string;
+}
+
+export const alumniData: Alumnus[] = [
+  { name: "Rahul Deshmukh", batch: "2022", company: "Tesla", position: "Battery Design Engineer", location: "California, USA", linkedin: "https://linkedin.com", team: "Formula Student", initials: "RD" },
+  { name: "Meera Nair", batch: "2023", company: "Boeing", position: "Aerodynamics Analyst", location: "Bangalore, India", linkedin: "https://linkedin.com", team: "Aero Design", initials: "MN" },
+  { name: "Abhishek Roy", batch: "2021", company: "Ford Performance", position: "Vehicle Dynamics Engineer", location: "Michigan, USA", linkedin: "https://linkedin.com", team: "BAJA SAE", initials: "AR" },
+  { name: "Shreya Sen", batch: "2024", company: "Mercedes AMG F1", position: "Junior Aerodynamicist", location: "Brackley, UK", linkedin: "https://linkedin.com", team: "Formula Student", initials: "SS" },
+  { name: "Varun Mehta", batch: "2023", company: "Mahindra Electric", position: "BMS Developer", location: "Pune, India", linkedin: "https://linkedin.com", team: "EV Team", initials: "VM" },
+  { name: "Aditi Joshi", batch: "2020", company: "Ather Energy", position: "Chassis Design Engineer", location: "Bangalore, India", linkedin: "https://linkedin.com", team: "BAJA SAE", initials: "AJ" }
+];
