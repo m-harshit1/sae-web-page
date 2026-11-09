@@ -40,9 +40,9 @@ function ModelWithRaycasting({ activeSubtab, explosionLevel }: Props) {
           mesh.geometry.computeVertexNormals();
         }
         mesh.material = new THREE.MeshStandardMaterial({
-          color: new THREE.Color('#FF334B'),
-          metalness: 0.6,
-          roughness: 0.3,
+          vertexColors: true,
+          metalness: 0.5,
+          roughness: 0.35,
           side: THREE.DoubleSide,
         });
       }

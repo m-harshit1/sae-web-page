@@ -48,14 +48,14 @@ const navItems: NavItem[] = [
 const searchIndex: SearchResult[] = [
   { label: "Home",               tab: "home",     description: "Club overview, gallery & stats",           icon: <Home size={14} />,          category: "Pages" },
   { label: "Vehicle B-26 Specs", tab: "projects", description: "Chassis, drivetrain, suspension, brakes",  icon: <Wrench size={14} />,        category: "Pages" },
-  { label: "Team Roster",        tab: "teams",    description: "Officers, leads & alumni mentors",          icon: <Users size={14} />,         category: "Pages" },
+  { label: "Team Roster",        tab: "teams",    description: "Executive officers & subsystem leads",     icon: <Users size={14} />,         category: "Pages" },
   { label: "Blog & News",        tab: "blog",     description: "Shakedown reports, outreach updates",       icon: <BookOpen size={14} />,      category: "Pages" },
   { label: "Join Us",            tab: "join",     description: "Recruitment pipeline & sponsor tiers",      icon: <UserPlus size={14} />,      category: "Pages" },
   { label: "Admin Portal",       tab: "portal",   description: "Tasks, inventory & member roster",          icon: <LayoutDashboard size={14} />, category: "Pages" },
   { label: "Chassis FEA",        tab: "projects", description: "ANSYS stress & safety factor analysis",    icon: <Wrench size={14} />,        category: "Engineering" },
   { label: "CVT Calculator",     tab: "projects", description: "Interactive drivetrain speed calculator",   icon: <Wrench size={14} />,        category: "Engineering" },
   { label: "Baja ATV B-26",      tab: "projects", description: "50.1 km/h · 166.2 Nm · 2.94 m/s²",        icon: <Zap size={14} />,           category: "Engineering" },
-  { label: "Alumni Network",     tab: "teams",    description: "Mentorship booking with alumni engineers",  icon: <Users size={14} />,         category: "People" },
+  { label: "Org Hierarchy",      tab: "teams",    description: "Student leadership tree & divisions",       icon: <Users size={14} />,         category: "People" },
   { label: "Faculty Advisors",   tab: "teams",    description: "In-charge professors & their roles",        icon: <Users size={14} />,         category: "People" },
   { label: "AWIM Outreach",      tab: "home",     description: "K-12 STEM mentoring programme details",     icon: <Home size={14} />,          category: "Outreach" },
   { label: "Sponsorship Tiers",  tab: "join",     description: "Gold, Silver, Bronze ROI packages",         icon: <UserPlus size={14} />,      category: "Sponsors" },
@@ -347,7 +347,7 @@ export default function SAEIndiaHubContent() {
                 type="text"
                 className="search-input"
                 style={{ padding: 0, borderBottom: "none", fontSize: "0.95rem" }}
-                placeholder="Search pages, specs, members, alumni…"
+                placeholder="Search pages, specs, members, teams…"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 aria-label="Search"

@@ -47,11 +47,5 @@ export interface Alumnus {
   initials: string;
 }
 
-export const alumniData: Alumnus[] = [
-  { name: "Rahul Deshmukh", batch: "2022", company: "Tesla", position: "Battery Design Engineer", location: "California, USA", linkedin: "https://linkedin.com", team: "Formula Student", initials: "RD" },
-  { name: "Meera Nair", batch: "2023", company: "Boeing", position: "Aerodynamics Analyst", location: "Bangalore, India", linkedin: "https://linkedin.com", team: "Aero Design", initials: "MN" },
-  { name: "Abhishek Roy", batch: "2021", company: "Ford Performance", position: "Vehicle Dynamics Engineer", location: "Michigan, USA", linkedin: "https://linkedin.com", team: "BAJA SAE", initials: "AR" },
-  { name: "Shreya Sen", batch: "2024", company: "Mercedes AMG F1", position: "Junior Aerodynamicist", location: "Brackley, UK", linkedin: "https://linkedin.com", team: "Formula Student", initials: "SS" },
-  { name: "Varun Mehta", batch: "2023", company: "Mahindra Electric", position: "BMS Developer", location: "Pune, India", linkedin: "https://linkedin.com", team: "EV Team", initials: "VM" },
-  { name: "Aditi Joshi", batch: "2020", company: "Ather Energy", position: "Chassis Design Engineer", location: "Bangalore, India", linkedin: "https://linkedin.com", team: "BAJA SAE", initials: "AJ" }
-];
+// Chapter Inception: 2025 — Zero alumni currently (Inaugural cohorts graduating 2027/2028)
+export const alumniData: Alumnus[] = [];

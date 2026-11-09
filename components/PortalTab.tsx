@@ -78,8 +78,7 @@ export default function PortalTab() {
   const [newInventoryDept, setNewInventoryDept] = useState<string>("Chassis");
 
   const [newAttendanceName, setNewAttendanceName] = useState<string>("");
-  const [newAttendanceHours, setNewAttendanceHours] = useState<number>(0);
-  const [newAttendanceRole, setNewAttendanceRole] = useState<string>("Member");
+  const [newAttendanceRole, setNewAttendanceRole] = useState<string>("");
 
   // Blog publishing states
   const [blogTitle, setBlogTitle] = useState("");
@@ -270,21 +269,20 @@ export default function PortalTab() {
   // Attendance actions (Admin only)
   const handleAddAttendance = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newAttendanceName.trim() || newAttendanceHours < 0) return;
+    if (!newAttendanceName.trim()) return;
     const res = await fetch('/api/attendance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: newAttendanceName,
-        hours: newAttendanceHours,
-        role: newAttendanceRole
+        name: newAttendanceName.trim(),
+        role: newAttendanceRole.trim() || 'Team Member'
       })
     });
     if (res.ok) {
       const rec = await res.json();
-      setAttendance([...attendance, rec]);
+      setAttendance([rec, ...attendance]);
       setNewAttendanceName("");
-      setNewAttendanceHours(0);
+      setNewAttendanceRole("");
     }
   };
 
@@ -929,7 +927,7 @@ export default function PortalTab() {
               <h3 className="font-heading font-extrabold text-sm uppercase tracking-wider text-white">
                 WORKSHOP ATTENDANCE RECORD
               </h3>
-              <span className="font-mono text-[10px] text-slate-400">Hours Registered</span>
+              <span className="font-mono text-[10px] text-slate-400">Session Check-in</span>
             </div>
 
             <div className="space-y-3 font-mono text-xs max-h-[200px] overflow-y-auto pr-1">
@@ -937,7 +935,7 @@ export default function PortalTab() {
                 <div key={rec.id} className="flex justify-between items-center bg-carbon-900/40 p-3 border border-white/5 rounded">
                   <div>
                     <strong className="text-white block uppercase text-[11px]">{rec.name}</strong>
-                    <span className="text-slate-400 text-[10px]">{rec.role} | {rec.hours} Hours Spent</span>
+                    <span className="text-slate-400 text-[10px]">{rec.role || "Team Member"} • Check-in Verified</span>
                   </div>
 
                   <button
@@ -955,41 +953,30 @@ export default function PortalTab() {
             </div>
 
             <form onSubmit={handleAddAttendance} className="border-t border-white/5 pt-4 space-y-2 font-mono text-xs">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <input 
                   type="text" 
                   required
                   value={newAttendanceName}
                   onChange={(e) => setNewAttendanceName(e.target.value)}
-                  placeholder="Member name"
+                  placeholder="Member name..."
                   className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
                 />
-                <input 
-                  type="number" 
-                  required
-                  value={newAttendanceHours}
-                  onChange={(e) => setNewAttendanceHours(Number(e.target.value))}
-                  placeholder="Hours spent"
-                  className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
-                />
-              </div>
-              <div className="flex gap-2">
                 <input 
                   type="text" 
-                  required
                   value={newAttendanceRole}
                   onChange={(e) => setNewAttendanceRole(e.target.value)}
-                  placeholder="e.g. Subsystem Lead"
-                  className="w-full bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
+                  placeholder="Role or Subsystem..."
+                  className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
                 />
-                <button
-                  type="submit"
-                  className="bg-apex-red hover:bg-apex-red/90 text-white font-bold uppercase px-4 rounded flex items-center justify-center gap-1 cursor-pointer"
-                >
-                  <Plus size={14} />
-                  <span>Log</span>
-                </button>
               </div>
+              <button
+                type="submit"
+                className="w-full bg-apex-red hover:bg-apex-red/90 text-white font-bold uppercase py-2.5 rounded flex items-center justify-center gap-1 cursor-pointer transition-all"
+              >
+                <Plus size={14} />
+                <span>Log Member Check-in</span>
+              </button>
             </form>
           </div>
         </div>
