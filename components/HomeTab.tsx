@@ -253,9 +253,9 @@ export default function HomeTab({ switchPage }: HomeTabProps) {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { val: 50, suffix: "+", label: "Active Members", desc: "Specialized subsystem teams", color: "text-white" },
-              { val: 4, suffix: "+", label: "Years Active", desc: "Since our 2023 inception", color: "text-apex-red" },
-              { val: 10, suffix: "+", label: "Industry Sponsors", desc: "Fueling fabrication & tests", color: "text-torque-orange" },
+              { val: 77, suffix: "", label: "Active Members", desc: "Specialized subsystem teams", color: "text-white" },
+              { val: 2025, suffix: "", label: "Inception Year", desc: "Since our 2025 inception", color: "text-apex-red" },
+              { val: 0, suffix: "", label: "Industry Partners", desc: "Open for 2025-26 onboarding", color: "text-torque-orange" },
               { val: 100, suffix: "+", label: "Students Mentored", desc: "Kurnool AWIM STEM Outreach", color: "text-emerald-400" },
             ].map((s, i) => (
               <RevealOnScroll key={i} delay={i * 0.1}>
@@ -306,7 +306,7 @@ export default function HomeTab({ switchPage }: HomeTabProps) {
                 [ OUR_COLLEGIATE_MISSION ]
               </h3>
               <p className="text-slate-300 text-xs leading-relaxed font-sans">
-                Founded in 2023 at the Indian Institute of Information Technology, Design & Manufacturing (IIITDM), Kurnool, our collegiate club acts as an incubator for hands-on technical skills. We organize specialized student teams to apply classroom mathematics directly to multi-body dynamic software simulations, chassis TIG weldments, and circuit testing.
+                Founded in 2025 at the Indian Institute of Information Technology, Design & Manufacturing (IIITDM), Kurnool, our collegiate club acts as an incubator for hands-on technical skills. We organize specialized student teams to apply classroom mathematics directly to multi-body dynamic software simulations, chassis TIG weldments, and circuit testing.
               </p>
             </div>
             </RevealOnScroll>
