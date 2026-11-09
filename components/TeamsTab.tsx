@@ -149,7 +149,7 @@ export default function TeamsTab() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-1">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-black/70 border border-torque-orange/50 p-2 shrink-0 flex items-center justify-center shadow-xl shadow-torque-orange/15 backdrop-blur-md">
+                  <div className="w-24 h-16 sm:w-28 sm:h-20 rounded-2xl bg-black/85 border border-torque-orange/50 p-2.5 shrink-0 flex items-center justify-center shadow-2xl shadow-torque-orange/20 backdrop-blur-md">
                     <img src="/monarch_logo.png" alt="Team Monarch Racing" className="w-full h-full object-contain drop-shadow" />
                   </div>
                   <div>

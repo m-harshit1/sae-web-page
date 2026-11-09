@@ -179,7 +179,12 @@ export default function ProjectsTab() {
                   </span>
                   <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded font-mono text-xs led-pulse">RUNNING</span>
                 </div>
-                <h3 className="font-heading font-black text-xl uppercase tracking-tight text-white">BAJA ATV — B-26</h3>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-8 bg-black/60 border border-torque-orange/40 rounded p-1 flex items-center justify-center shrink-0">
+                    <img src="/monarch_logo.png" alt="Team Monarch Racing" className="w-full h-full object-contain" />
+                  </div>
+                  <h3 className="font-heading font-black text-xl uppercase tracking-tight text-white">BAJA ATV — B-26</h3>
+                </div>
                 <p className="text-slate-400 text-xs leading-relaxed font-sans">
                   AISI 4030 Chromoly tubular roll cage, double-wishbone suspension system, Honda GX430T powertrain, and custom 4WD layout.
                 </p>

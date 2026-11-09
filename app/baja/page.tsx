@@ -20,9 +20,16 @@ export default function BajaWorkspace3D() {
           >
             ← Return to Cockpit
           </Link>
-          <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#E11D48] animate-pulse" />
-            <span className="font-bold tracking-widest text-sm uppercase hidden sm:inline">B-26 CAD CORE // FULL VEHICLE ASSEMBLY</span>
+          <div className="flex items-center space-x-2.5">
+            <div className="h-8 w-11 flex items-center justify-center shrink-0">
+              <img src="/monarch_logo.png" alt="Team Monarch Racing" className="max-h-full max-w-full object-contain drop-shadow" />
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-[#E11D48] animate-pulse" />
+              <span className="font-bold tracking-widest text-xs uppercase hidden sm:inline">
+                TEAM MONARCH RACING // B-26 CAD CORE
+              </span>
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-4">
