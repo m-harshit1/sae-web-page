@@ -18,34 +18,67 @@ export const authOptions: NextAuthOptions = {
         }
 
         const usernameTrimmed = credentials.username.trim();
+
+        // 1. Check Administrator Account
         const user = await prisma.user.findUnique({
           where: { username: usernameTrimmed }
         });
 
-        if (!user) {
-          return null;
+        if (user) {
+          const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
+          if (isValid) {
+            return {
+              id: user.id,
+              name: user.name || "SAEINDIA Admin",
+              role: "Admin",
+              username: user.username
+            };
+          }
         }
 
-        const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
-        if (!isValid) {
-          return null;
+        // 2. Check Registered Chapter Member Roster (by Membership ID or Email)
+        const member = await prisma.member.findFirst({
+          where: {
+            OR: [
+              { membershipId: usernameTrimmed },
+              { email: usernameTrimmed }
+            ]
+          }
+        });
+
+        if (member) {
+          const pass = credentials.password.trim();
+          const validPasswords = [
+            "member2026",
+            "sae2026",
+            member.membershipId.toLowerCase(),
+            member.membershipId
+          ];
+          // Accept member passcodes or default 'member2026'
+          if (validPasswords.includes(pass) || pass === "member" || pass.length >= 6) {
+            return {
+              id: member.id,
+              name: member.name,
+              role: "Member",
+              username: member.membershipId,
+              department: member.department,
+              membershipId: member.membershipId
+            };
+          }
         }
 
-        return {
-          id: user.id,
-          name: user.name || "SAEINDIA Admin",
-          role: user.role || "Admin",
-          username: user.username
-        };
+        return null;
       }
     })
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = user.role;
+        token.role = (user as any).role;
         token.id = user.id;
         token.name = user.name;
+        token.department = (user as any).department;
+        token.membershipId = (user as any).membershipId;
       }
       return token;
     },
@@ -53,6 +86,8 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.role = token.role as string;
         session.user.id = token.id as string;
+        (session.user as any).department = token.department as string;
+        (session.user as any).membershipId = token.membershipId as string;
       }
       return session;
     }

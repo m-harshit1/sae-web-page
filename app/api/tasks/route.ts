@@ -19,8 +19,8 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any)?.role !== 'Admin') {
-      return NextResponse.json({ error: 'Unauthorized. Admin credentials required.' }, { status: 401 });
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized. Member or Admin authentication required.' }, { status: 401 });
     }
     const { title, assignee, priority } = await req.json();
     if (!title || typeof title !== 'string' || !title.trim()) {

@@ -48,12 +48,14 @@ export default function PortalTab() {
   const { data: session, status: sessionStatus } = useSession();
   const isAuthenticated = sessionStatus === 'authenticated';
   const isLoadingSession = sessionStatus === 'loading';
+  const [loginTab, setLoginTab] = useState<"member" | "admin">("member");
   const [usernameInput, setUsernameInput] = useState<string>("");
   const [passwordInput, setPasswordInput] = useState<string>("");
   const [isAuthenticating, setIsAuthenticating] = useState<boolean>(false);
   const [loginError, setLoginError] = useState<string>("");
 
-  const isAdmin = (session?.user as any)?.role === 'Admin' || isAuthenticated;
+  const userRole = (session?.user as any)?.role;
+  const isAdmin = userRole === 'Admin';
 
   // Local state structures
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -120,7 +122,11 @@ export default function PortalTab() {
         password: passwordInput,
       });
       if (res?.error) {
-        setLoginError("Invalid administrator credentials. Access restricted to authorized personnel.");
+        if (loginTab === "admin") {
+          setLoginError("Invalid administrator credentials. Access restricted to authorized root personnel.");
+        } else {
+          setLoginError("Invalid Member ID, Email, or Passcode. Ensure your membership is registered on the chapter roster.");
+        }
       } else {
         fetchData();
       }
@@ -307,26 +313,75 @@ export default function PortalTab() {
     );
   }
 
-  // Pure Admin Login Gateway - Zero membership ID bypass
+  // Dual Member & Admin Login Gateway
   if (!isAuthenticated) {
     return (
-      <div className="py-20 px-4 max-w-md mx-auto space-y-6 animate-fadeIn">
-        <div className="bg-[#1E2025]/60 border border-white/10 rounded-2xl p-8 glass-panel space-y-6 relative overflow-hidden backdrop-blur-xl shadow-2xl">
-          <div className="absolute -top-12 -right-12 w-36 h-36 bg-apex-red/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="py-20 px-4 max-w-lg mx-auto space-y-6 animate-fadeIn">
+        <div className="bg-[#1E2025]/70 border border-white/10 rounded-2xl p-6 sm:p-8 glass-panel space-y-6 relative overflow-hidden backdrop-blur-xl shadow-2xl">
+          <div className="absolute -top-12 -right-12 w-40 h-40 bg-apex-red/15 rounded-full blur-3xl pointer-events-none"></div>
 
-          <div className="text-center space-y-3">
-            <div className="w-16 h-16 rounded-2xl bg-apex-red/10 border border-apex-red/25 flex items-center justify-center text-apex-red mx-auto shadow-lg shadow-apex-red/10">
-              <Lock size={28} className="animate-pulse" />
+          {/* Mode Switcher Tabs: Member Login | Admin Gateway */}
+          <div className="grid grid-cols-2 p-1 bg-carbon-900 border border-white/10 rounded-xl font-mono text-xs font-bold uppercase tracking-wider">
+            <button
+              type="button"
+              onClick={() => {
+                setLoginTab("member");
+                setLoginError("");
+                setUsernameInput("");
+                setPasswordInput("");
+              }}
+              className={`py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                loginTab === "member"
+                  ? "bg-torque-orange text-white shadow-md shadow-torque-orange/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Users size={14} />
+              <span>Member Login</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setLoginTab("admin");
+                setLoginError("");
+                setUsernameInput("");
+                setPasswordInput("");
+              }}
+              className={`py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                loginTab === "admin"
+                  ? "bg-apex-red text-white shadow-md shadow-apex-red/20"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Shield size={14} />
+              <span>Admin Gateway</span>
+            </button>
+          </div>
+
+          {/* Header Description */}
+          <div className="text-center space-y-2">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto shadow-lg ${
+              loginTab === "member" 
+                ? "bg-torque-orange/15 border border-torque-orange/30 text-torque-orange shadow-torque-orange/10" 
+                : "bg-apex-red/15 border border-apex-red/30 text-apex-red shadow-apex-red/10"
+            }`}>
+              {loginTab === "member" ? <Users size={26} /> : <Lock size={26} className="animate-pulse" />}
             </div>
             <div>
-              <div className="inline-block px-3 py-0.5 mb-2 rounded-full bg-apex-red/10 border border-apex-red/30 text-apex-red font-mono text-[9px] font-bold uppercase tracking-widest">
-                Restricted Access // Administrator Only
+              <div className={`inline-block px-3 py-0.5 mb-1.5 rounded-full font-mono text-[9px] font-bold uppercase tracking-widest border ${
+                loginTab === "member"
+                  ? "bg-torque-orange/10 border-torque-orange/30 text-torque-orange"
+                  : "bg-apex-red/10 border-apex-red/30 text-apex-red"
+              }`}>
+                {loginTab === "member" ? "SAEINDIA Chapter Member Access" : "Restricted Access // Root Admin Only"}
               </div>
               <h3 className="font-heading font-black text-2xl uppercase tracking-tight text-white">
-                ADMIN PORTAL GATEWAY
+                {loginTab === "member" ? "TEAM MEMBER ACCESS" : "ADMINISTRATOR PORTAL"}
               </h3>
-              <p className="text-slate-400 text-xs font-sans mt-2 leading-relaxed">
-                Sign in with administrator credentials to manage tasks, members, workshop inventory, and chapter bulletins.
+              <p className="text-slate-400 text-xs font-sans mt-1 leading-relaxed">
+                {loginTab === "member"
+                  ? "Sign in with your registered Membership ID or IIITDM email to view sprint tasks, workshop inventory, and your digital badge."
+                  : "Sign in with root administrator credentials to manage tasks, members, workshop inventory, and chapter bulletins."}
               </p>
             </div>
           </div>
@@ -340,7 +395,7 @@ export default function PortalTab() {
             
             <div className="space-y-1.5">
               <label className="text-slate-300 block uppercase font-bold text-[10px] tracking-wider">
-                Admin Username
+                {loginTab === "member" ? "Membership ID or IIITDM Email" : "Admin Username"}
               </label>
               <input 
                 type="text" 
@@ -351,14 +406,14 @@ export default function PortalTab() {
                   setUsernameInput(e.target.value);
                   if (loginError) setLoginError("");
                 }}
-                placeholder="Enter admin username"
-                className="w-full bg-carbon-900 border border-white/10 p-3.5 rounded-lg text-white focus:outline-none focus:border-apex-red transition-all font-semibold"
+                placeholder={loginTab === "member" ? "e.g. SAEBAJA-2026-002 or your @iiitk.ac.in email" : "Enter admin username"}
+                className="w-full bg-carbon-900 border border-white/10 p-3.5 rounded-lg text-white focus:outline-none focus:border-torque-orange transition-all font-semibold"
               />
             </div>
 
             <div className="space-y-1.5">
               <label className="text-slate-300 block uppercase font-bold text-[10px] tracking-wider">
-                Admin Password
+                {loginTab === "member" ? "Member Passcode" : "Admin Password"}
               </label>
               <input 
                 type="password" 
@@ -369,15 +424,48 @@ export default function PortalTab() {
                   setPasswordInput(e.target.value);
                   if (loginError) setLoginError("");
                 }}
-                placeholder="••••••••"
-                className="w-full bg-carbon-900 border border-white/10 p-3.5 rounded-lg text-white focus:outline-none focus:border-apex-red transition-all font-semibold"
+                placeholder={loginTab === "member" ? "Enter member password (default: member2026)" : "••••••••"}
+                className="w-full bg-carbon-900 border border-white/10 p-3.5 rounded-lg text-white focus:outline-none focus:border-torque-orange transition-all font-semibold"
               />
             </div>
+
+            {/* Quick helper for members */}
+            {loginTab === "member" && (
+              <div className="p-2.5 bg-white/5 border border-white/5 rounded-lg text-[10px] text-slate-400 space-y-1">
+                <span className="text-slate-300 font-bold block uppercase">Registered Roster Quickfill:</span>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUsernameInput("SAEBAJA-2026-002");
+                      setPasswordInput("member2026");
+                    }}
+                    className="px-2 py-0.5 bg-carbon-900 hover:bg-torque-orange/20 hover:text-torque-orange border border-white/10 rounded cursor-pointer transition-all"
+                  >
+                    Roshanth (SAEBAJA-2026-002)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUsernameInput("SAEBAJA-2026-003");
+                      setPasswordInput("member2026");
+                    }}
+                    className="px-2 py-0.5 bg-carbon-900 hover:bg-torque-orange/20 hover:text-torque-orange border border-white/10 rounded cursor-pointer transition-all"
+                  >
+                    Vineet (SAEBAJA-2026-003)
+                  </button>
+                </div>
+              </div>
+            )}
 
             <button 
               type="submit"
               disabled={isAuthenticating}
-              className="w-full bg-apex-red hover:bg-apex-red/90 disabled:opacity-50 text-white font-bold uppercase py-3.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-apex-red/20 font-heading tracking-wider text-xs"
+              className={`w-full text-white font-bold uppercase py-3.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg font-heading tracking-wider text-xs ${
+                loginTab === "member"
+                  ? "bg-torque-orange hover:bg-torque-orange/90 shadow-torque-orange/20"
+                  : "bg-apex-red hover:bg-apex-red/90 shadow-apex-red/20"
+              }`}
             >
               {isAuthenticating ? (
                 <span className="flex items-center gap-2">
@@ -385,7 +473,7 @@ export default function PortalTab() {
                   Authenticating...
                 </span>
               ) : (
-                <span>Authenticate Session</span>
+                <span>{loginTab === "member" ? "Sign In as Team Member" : "Authenticate Administrator"}</span>
               )}
             </button>
           </form>
@@ -400,32 +488,45 @@ export default function PortalTab() {
     );
   }
 
-  // Authenticated Admin Cockpit View
+  // Authenticated Cockpit View
   return (
     <div className="animate-fadeIn py-16 px-4 max-w-7xl mx-auto space-y-12">
       
-      {/* Admin Cockpit Header Bar */}
+      {/* Cockpit Header Bar */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-titanium-700/60 border border-white/10 rounded-lg p-6 glass-panel">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 led-pulse"></span>
             <span className="font-heading font-black text-lg uppercase tracking-tight text-white">
-              SAEBAJA ADMIN PORTAL &amp; COCKPIT
+              {isAdmin ? "SAEBAJA ADMIN PORTAL & COCKPIT" : "SAEINDIA MEMBER PORTAL & SPRINT HUD"}
             </span>
-            <span className="ml-2 px-2.5 py-0.5 rounded bg-apex-red/20 text-apex-red border border-apex-red/30 font-mono text-[9px] uppercase font-bold tracking-wider">
-              [🛡️ ROOT ADMINISTRATOR]
-            </span>
+            {isAdmin ? (
+              <span className="ml-2 px-2.5 py-0.5 rounded bg-apex-red/20 text-apex-red border border-apex-red/30 font-mono text-[9px] uppercase font-bold tracking-wider">
+                [🛡️ ROOT ADMINISTRATOR]
+              </span>
+            ) : (
+              <span className="ml-2 px-2.5 py-0.5 rounded bg-torque-orange/20 text-torque-orange border border-torque-orange/30 font-mono text-[9px] uppercase font-bold tracking-wider">
+                [🏎️ ACTIVE MEMBER]
+              </span>
+            )}
           </div>
           <p className="text-slate-400 text-xs font-sans">
-            Authenticated as <strong className="text-white">{session?.user?.name || "SAEINDIA Admin"}</strong> — Full administrative privileges enabled. Only administrator can modify portal database records.
+            Authenticated as <strong className="text-white">{session?.user?.name || "Team Member"}</strong>
+            {isAdmin 
+              ? " — Full administrative privileges enabled. All chapter databases unlocked." 
+              : " — Member access enabled. You can track sprints, update task progress, and view workshop inventory."}
           </p>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 font-mono text-xs">
-            <span className="text-slate-400 uppercase text-[10px] font-bold">Status:</span>
-            <span className="px-2.5 py-1 rounded text-[10px] uppercase font-bold tracking-wider border bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
-              ● Active Session
+            <span className="text-slate-400 uppercase text-[10px] font-bold">Role:</span>
+            <span className={`px-2.5 py-1 rounded text-[10px] uppercase font-bold tracking-wider border ${
+              isAdmin 
+                ? "bg-apex-red/10 border-apex-red/30 text-apex-red" 
+                : "bg-torque-orange/10 border-torque-orange/30 text-torque-orange"
+            }`}>
+              ● {isAdmin ? "Admin" : (session?.user as any)?.role || "Member"}
             </span>
           </div>
 
@@ -478,13 +579,15 @@ export default function PortalTab() {
                       <option value="Done">Done</option>
                     </select>
 
-                    <button
-                      onClick={() => handleDeleteTask(task.id)}
-                      className="p-1.5 text-slate-400 hover:text-apex-red transition-colors cursor-pointer"
-                      title="Remove task (Admin only)"
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="p-1.5 text-slate-400 hover:text-apex-red transition-colors cursor-pointer"
+                        title="Remove task (Admin only)"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -531,13 +634,15 @@ export default function PortalTab() {
         {/* E-Card & Member Database Roster */}
         <div className="lg:col-span-5 space-y-8">
           
-          {/* Official Admin Card */}
+          {/* Official Admin / Member Card */}
           <div className="bg-titanium-700/30 border border-white/10 rounded-lg p-6 space-y-4 glass-panel">
             <div className="flex justify-between items-center border-b border-white/10 pb-3">
               <h3 className="font-heading font-extrabold text-sm uppercase tracking-wider text-white">
-                ADMINISTRATOR CREDENTIAL CARD
+                {isAdmin ? "ADMINISTRATOR CREDENTIAL CARD" : "CHAPTER MEMBER DIGITAL CREDENTIAL"}
               </h3>
-              <span className="font-mono text-[10px] text-emerald-400 font-bold">[VERIFIED ROOT]</span>
+              <span className={`font-mono text-[10px] font-bold ${isAdmin ? "text-emerald-400" : "text-torque-orange"}`}>
+                {isAdmin ? "[VERIFIED ROOT]" : "[VERIFIED ACTIVE MEMBER]"}
+              </span>
             </div>
 
             <div className="relative overflow-hidden rounded-xl border border-white/20 bg-gradient-to-br from-[#1e2025] via-[#2a2d35] to-[#121316] p-5 shadow-2xl flex flex-col justify-between h-[180px] group transition-all duration-500 hover:scale-[1.02] hover:border-torque-orange/50">
@@ -548,28 +653,42 @@ export default function PortalTab() {
                   <span className="text-[9px] text-slate-400 uppercase tracking-widest block font-bold">SAEINDIA STUDENT CHAPTER</span>
                   <span className="text-[8px] text-torque-orange font-bold uppercase tracking-widest">IIITDM KURNOOL // SAEBAJA</span>
                 </div>
-                <div className="w-8 h-8 bg-apex-red flex items-center justify-center font-heading font-black text-sm italic text-white skew-x-12 select-none">
+                <div className={`w-8 h-8 flex items-center justify-center font-heading font-black text-sm italic text-white skew-x-12 select-none ${
+                  isAdmin ? "bg-apex-red" : "bg-torque-orange"
+                }`}>
                   SAE
                 </div>
               </div>
 
               <div className="space-y-1">
                 <span className="text-white text-sm uppercase font-bold tracking-wider block font-sans">
-                  {session?.user?.name || "Harshit Kumar Mishra"}
+                  {session?.user?.name || (isAdmin ? "Harshit Kumar Mishra" : "Team Member")}
                 </span>
                 <span className="text-slate-400 text-[9px] block">
-                  ROLE: <strong className="text-white">ADMINISTRATOR (ROOT)</strong>
+                  ROLE: <strong className="text-white">{isAdmin ? "ADMINISTRATOR (ROOT)" : ((session?.user as any)?.role || "TEAM MEMBER")}</strong>
+                  {!isAdmin && (session?.user as any)?.membershipId && (
+                    <span className="ml-2 text-torque-orange font-mono font-bold">ID: {(session?.user as any)?.membershipId}</span>
+                  )}
+                  {!isAdmin && (session?.user as any)?.department && (
+                    <span className="ml-2 text-slate-300 font-mono">({(session?.user as any)?.department})</span>
+                  )}
                 </span>
               </div>
 
               <div className="flex justify-between items-end border-t border-white/10 pt-2 text-[8px] text-slate-400 font-mono">
                 <div>
                   <span className="block font-bold">ACCESS LEVEL</span>
-                  <strong className="text-white text-[10px] tracking-wider">FULL PORTAL ADMIN</strong>
+                  <strong className="text-white text-[10px] tracking-wider">
+                    {isAdmin ? "FULL PORTAL ADMIN" : "SPRINT TRACKING & WORKSHOP HUD"}
+                  </strong>
                 </div>
                 <div className="text-right">
                   <span className="block font-bold">SECURITY CLEARANCE</span>
-                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold uppercase tracking-wider text-[8px] led-pulse">AUTHORIZED</span>
+                  <span className={`px-1.5 py-0.5 rounded font-bold uppercase tracking-wider text-[8px] led-pulse ${
+                    isAdmin ? "bg-emerald-500/20 text-emerald-400" : "bg-torque-orange/20 text-torque-orange"
+                  }`}>
+                    {isAdmin ? "ROOT AUTHORIZED" : "MEMBER ACTIVE"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -600,63 +719,74 @@ export default function PortalTab() {
                     <span className="text-slate-400 text-[10px]">{member.role} | {member.department}</span>
                   </div>
 
-                  <button
-                    onClick={() => handleDeleteMember(member.id)}
-                    className="p-1.5 text-slate-400 hover:text-apex-red transition-colors cursor-pointer"
-                    title="Remove member (Admin only)"
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDeleteMember(member.id)}
+                      className="p-1.5 text-slate-400 hover:text-apex-red transition-colors cursor-pointer"
+                      title="Remove member (Admin only)"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
 
-            <form onSubmit={handleAddMember} className="border-t border-white/5 pt-4 space-y-2 font-mono text-xs">
-              <div className="grid grid-cols-2 gap-2">
-                <input 
-                  type="text" 
-                  required
-                  value={newMemberName}
-                  onChange={(e) => setNewMemberName(e.target.value)}
-                  placeholder="Full name"
-                  className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
-                />
-                <input 
-                  type="text" 
-                  required
-                  value={newMemberRole}
-                  onChange={(e) => setNewMemberRole(e.target.value)}
-                  placeholder="Position role"
-                  className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <input 
-                  type="text" 
-                  value={newMemberMembershipId}
-                  onChange={(e) => setNewMemberMembershipId(e.target.value)}
-                  placeholder="ID (e.g. SAEBAJA-2026-011)"
-                  className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none uppercase"
-                />
-                <select
-                  value={newMemberDept}
-                  onChange={(e) => setNewMemberDept(e.target.value)}
-                  className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none cursor-pointer"
+            {isAdmin ? (
+              <form onSubmit={handleAddMember} className="border-t border-white/5 pt-4 space-y-2 font-mono text-xs">
+                <div className="grid grid-cols-2 gap-2">
+                  <input 
+                    type="text" 
+                    required
+                    value={newMemberName}
+                    onChange={(e) => setNewMemberName(e.target.value)}
+                    placeholder="Full name"
+                    className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
+                  />
+                  <input 
+                    type="text" 
+                    required
+                    value={newMemberRole}
+                    onChange={(e) => setNewMemberRole(e.target.value)}
+                    placeholder="Position role"
+                    className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <input 
+                    type="text" 
+                    value={newMemberMembershipId}
+                    onChange={(e) => setNewMemberMembershipId(e.target.value)}
+                    placeholder="ID (e.g. SAEBAJA-2026-011)"
+                    className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none uppercase"
+                  />
+                  <select
+                    value={newMemberDept}
+                    onChange={(e) => setNewMemberDept(e.target.value)}
+                    className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none cursor-pointer"
+                  >
+                    <option value="BAJA Division">BAJA Division</option>
+                    <option value="Formula Student">Formula Student Division</option>
+                    <option value="Aero Design">Aero Design Division</option>
+                    <option value="Executive Board">Executive Board</option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-apex-red/10 border border-apex-red hover:bg-apex-red hover:text-white text-apex-red font-bold uppercase py-2.5 rounded flex items-center justify-center gap-1 cursor-crosshair transition-all"
                 >
-                  <option value="BAJA Division">BAJA Division</option>
-                  <option value="Formula Student">Formula Student Division</option>
-                  <option value="Aero Design">Aero Design Division</option>
-                  <option value="Executive Board">Executive Board</option>
-                </select>
+                  <Plus size={14} />
+                  <span>[ REGISTER MEMBER TO DATABASE ]</span>
+                </button>
+              </form>
+            ) : (
+              <div className="border-t border-white/5 pt-3 text-center">
+                <span className="text-[10px] text-slate-500 font-mono flex items-center justify-center gap-1.5">
+                  <Shield size={12} className="text-apex-red" />
+                  Roster registry locked. Executive Admin privileges required to enroll members.
+                </span>
               </div>
-              <button
-                type="submit"
-                className="w-full bg-apex-red/10 border border-apex-red hover:bg-apex-red hover:text-white text-apex-red font-bold uppercase py-2.5 rounded flex items-center justify-center gap-1 cursor-crosshair transition-all"
-              >
-                <Plus size={14} />
-                <span>[ REGISTER MEMBER TO DATABASE ]</span>
-              </button>
-            </form>
+            )}
           </div>
         </div>
 
@@ -695,56 +825,67 @@ export default function PortalTab() {
                       {item.status}
                     </span>
 
-                    <button
-                      onClick={() => handleDeleteInventory(item.id)}
-                      className="p-1.5 text-slate-400 hover:text-apex-red transition-colors cursor-pointer"
-                      title="Remove item (Admin only)"
-                    >
-                      <Trash2 size={13} />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDeleteInventory(item.id)}
+                        className="p-1.5 text-slate-400 hover:text-apex-red transition-colors cursor-pointer"
+                        title="Remove item (Admin only)"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Add inventory item form */}
-          <form onSubmit={handleAddInventory} className="border-t border-white/10 pt-4 mt-6 grid grid-cols-12 gap-3 font-mono text-xs">
-            <input 
-              type="text"
-              required
-              value={newInventoryName}
-              onChange={(e) => setNewInventoryName(e.target.value)}
-              placeholder="Component part name..."
-              className="col-span-12 md:col-span-5 bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
-            />
-            <input 
-              type="text"
-              required
-              value={newInventoryQty}
-              onChange={(e) => setNewInventoryQty(e.target.value)}
-              placeholder="e.g. 8 units / 12m"
-              className="col-span-6 md:col-span-3 bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
-            />
-            <select
-              value={newInventoryDept}
-              onChange={(e) => setNewInventoryDept(e.target.value)}
-              className="col-span-6 md:col-span-2 bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none cursor-pointer"
-            >
-              <option value="Chassis">Chassis</option>
-              <option value="Suspension">Suspension</option>
-              <option value="Powertrain">Powertrain</option>
-              <option value="Brakes">Brakes</option>
-              <option value="Electronics">Electronics</option>
-            </select>
-            <button
-              type="submit"
-              className="col-span-12 md:col-span-2 bg-apex-red/10 border border-apex-red hover:bg-apex-red hover:text-white text-apex-red font-bold uppercase p-2.5 rounded flex items-center justify-center gap-1 cursor-crosshair transition-all"
-            >
-              <Plus size={14} />
-              <span>[ ADD ]</span>
-            </button>
-          </form>
+          {/* Add inventory item form (Admin only) */}
+          {isAdmin ? (
+            <form onSubmit={handleAddInventory} className="border-t border-white/10 pt-4 mt-6 grid grid-cols-12 gap-3 font-mono text-xs">
+              <input 
+                type="text"
+                required
+                value={newInventoryName}
+                onChange={(e) => setNewInventoryName(e.target.value)}
+                placeholder="Component part name..."
+                className="col-span-12 md:col-span-5 bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
+              />
+              <input 
+                type="text"
+                required
+                value={newInventoryQty}
+                onChange={(e) => setNewInventoryQty(e.target.value)}
+                placeholder="e.g. 8 units / 12m"
+                className="col-span-6 md:col-span-3 bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
+              />
+              <select
+                value={newInventoryDept}
+                onChange={(e) => setNewInventoryDept(e.target.value)}
+                className="col-span-6 md:col-span-2 bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none cursor-pointer"
+              >
+                <option value="Chassis">Chassis</option>
+                <option value="Suspension">Suspension</option>
+                <option value="Powertrain">Powertrain</option>
+                <option value="Brakes">Brakes</option>
+                <option value="Electronics">Electronics</option>
+              </select>
+              <button
+                type="submit"
+                className="col-span-12 md:col-span-2 bg-apex-red/10 border border-apex-red hover:bg-apex-red hover:text-white text-apex-red font-bold uppercase p-2.5 rounded flex items-center justify-center gap-1 cursor-crosshair transition-all"
+              >
+                <Plus size={14} />
+                <span>[ ADD ]</span>
+              </button>
+            </form>
+          ) : (
+            <div className="border-t border-white/10 pt-4 mt-6 text-center">
+              <span className="text-[10px] text-slate-500 font-mono flex items-center justify-center gap-1.5">
+                <Shield size={12} className="text-torque-orange" />
+                Workshop parts inventory stock managed by Subsystem Leads and Root Admins.
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Budget Tracker & Attendance Right Column */}
@@ -859,84 +1000,99 @@ export default function PortalTab() {
       <div className="bg-titanium-700/30 border border-white/10 rounded-lg p-6 lg:p-8 space-y-6 glass-panel font-mono text-xs animate-fadeIn">
         <div className="flex justify-between items-center border-b border-white/10 pb-4">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-apex-red led-pulse"></span>
+            <span className={`w-2.5 h-2.5 rounded-full ${isAdmin ? "bg-apex-red" : "bg-slate-500"} led-pulse`}></span>
             <h3 className="font-heading font-extrabold text-sm uppercase tracking-wider text-white">
-              PUBLISH CHAPTER NEWS REPORT / BLOG POST
+              {isAdmin ? "PUBLISH CHAPTER NEWS REPORT / BLOG POST" : "OFFICIAL CHAPTER BROADCAST NETWORK"}
             </h3>
           </div>
           <span className="font-mono text-[9px] text-slate-400">Database Broadcast Node</span>
         </div>
 
-        <form onSubmit={handlePublishPost} className="space-y-4">
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="md:col-span-2 space-y-1.5">
-              <label className="text-slate-300 block">REPORT TITLE</label>
+        {isAdmin ? (
+          <form onSubmit={handlePublishPost} className="space-y-4">
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="md:col-span-2 space-y-1.5">
+                <label className="text-slate-300 block">REPORT TITLE</label>
+                <input 
+                  type="text" 
+                  required
+                  value={blogTitle}
+                  onChange={(e) => setBlogTitle(e.target.value)}
+                  placeholder="e.g. B-26 Chassis TIG Weldments Quality Certification"
+                  className="w-full bg-carbon-900 border border-white/10 p-3 rounded text-white focus:outline-none focus:border-apex-red"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-slate-300 block">CATEGORY</label>
+                <select 
+                  value={blogCategory}
+                  onChange={(e) => setBlogCategory(e.target.value as any)}
+                  className="w-full bg-carbon-900 border border-white/10 p-3 rounded text-white focus:outline-none focus:border-apex-red cursor-pointer"
+                >
+                  <option value="Announcements">Announcements</option>
+                  <option value="Testing">Testing</option>
+                  <option value="AWIM Outreach">AWIM Outreach</option>
+                  <option value="Competitions">Competitions</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-slate-300 block">BRIEF EXCERPT (OPTIONAL - WILL AUTO-TRUNCATE CONTENT IF LEFT BLANK)</label>
               <input 
                 type="text" 
-                required
-                value={blogTitle}
-                onChange={(e) => setBlogTitle(e.target.value)}
-                placeholder="e.g. B-26 Chassis TIG Weldments Quality Certification"
+                value={blogExcerpt}
+                onChange={(e) => setBlogExcerpt(e.target.value)}
+                placeholder="A short summary of the report to display on card lists..."
                 className="w-full bg-carbon-900 border border-white/10 p-3 rounded text-white focus:outline-none focus:border-apex-red"
               />
             </div>
+
             <div className="space-y-1.5">
-              <label className="text-slate-300 block">CATEGORY</label>
-              <select 
-                value={blogCategory}
-                onChange={(e) => setBlogCategory(e.target.value as any)}
-                className="w-full bg-carbon-900 border border-white/10 p-3 rounded text-white focus:outline-none focus:border-apex-red cursor-pointer"
-              >
-                <option value="Announcements">Announcements</option>
-                <option value="Testing">Testing</option>
-                <option value="AWIM Outreach">AWIM Outreach</option>
-                <option value="Competitions">Competitions</option>
-              </select>
+              <label className="text-slate-300 block">FULL REPORT BODY CONTENT</label>
+              <textarea 
+                rows={5}
+                required
+                value={blogContent}
+                onChange={(e) => setBlogContent(e.target.value)}
+                placeholder="Write full article content here. Markdown formatting or paragraph splits supported..."
+                className="w-full bg-carbon-900 border border-white/10 p-3 rounded text-white focus:outline-none focus:border-apex-red font-sans text-xs"
+              ></textarea>
             </div>
-          </div>
 
-          <div className="space-y-1.5">
-            <label className="text-slate-300 block">BRIEF EXCERPT (OPTIONAL - WILL AUTO-TRUNCATE CONTENT IF LEFT BLANK)</label>
-            <input 
-              type="text" 
-              value={blogExcerpt}
-              onChange={(e) => setBlogExcerpt(e.target.value)}
-              placeholder="A short summary of the report to display on card lists..."
-              className="w-full bg-carbon-900 border border-white/10 p-3 rounded text-white focus:outline-none focus:border-apex-red"
-            />
-          </div>
+            <div className="flex items-center justify-between gap-4 pt-2">
+              <span className="text-slate-500 text-[10px] leading-tight font-sans">
+                * Published author: <strong className="text-white font-mono">{session?.user?.name || "Harshit Kumar Mishra (President / Administrator)"}</strong>
+              </span>
+              <button
+                type="submit"
+                className="bg-apex-red hover:bg-apex-red/90 text-white font-bold uppercase py-3.5 px-8 rounded transition-all cursor-pointer flex items-center gap-2"
+              >
+                <Plus size={14} />
+                <span>Broadcast Post to Public Feed</span>
+              </button>
+            </div>
 
-          <div className="space-y-1.5">
-            <label className="text-slate-300 block">FULL REPORT BODY CONTENT</label>
-            <textarea 
-              rows={5}
-              required
-              value={blogContent}
-              onChange={(e) => setBlogContent(e.target.value)}
-              placeholder="Write full article content here. Markdown formatting or paragraph splits supported..."
-              className="w-full bg-carbon-900 border border-white/10 p-3 rounded text-white focus:outline-none focus:border-apex-red font-sans text-xs"
-            ></textarea>
-          </div>
-
-          <div className="flex items-center justify-between gap-4 pt-2">
-            <span className="text-slate-500 text-[10px] leading-tight font-sans">
-              * Published author: <strong className="text-white font-mono">{session?.user?.name || "Harshit Kumar Mishra (President / Administrator)"}</strong>
+            {blogPublished && (
+              <p className="text-center text-emerald-400 font-bold mt-2">
+                ✓ Report successfully published to Chapter Blog!
+              </p>
+            )}
+          </form>
+        ) : (
+          <div className="p-5 bg-carbon-900/60 border border-white/5 rounded-lg text-slate-400 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Shield size={22} className="text-apex-red shrink-0" />
+              <div>
+                <strong className="text-white block text-sm font-heading uppercase">Official Broadcast Station</strong>
+                <span className="text-[11px] text-slate-400">Official chapter news publishing and public announcements are restricted to Root Administrators.</span>
+              </div>
+            </div>
+            <span className="px-3 py-1 bg-white/5 border border-white/10 rounded font-mono text-[9px] text-slate-400 uppercase font-bold self-start sm:self-center shrink-0">
+              🔒 Root Protected
             </span>
-            <button
-              type="submit"
-              className="bg-apex-red hover:bg-apex-red/90 text-white font-bold uppercase py-3.5 px-8 rounded transition-all cursor-pointer flex items-center gap-2"
-            >
-              <Plus size={14} />
-              <span>Broadcast Post to Public Feed</span>
-            </button>
           </div>
-
-          {blogPublished && (
-            <p className="text-center text-emerald-400 font-bold mt-2">
-              ✓ Report successfully published to Chapter Blog!
-            </p>
-          )}
-        </form>
+        )}
       </div>
 
     </div>

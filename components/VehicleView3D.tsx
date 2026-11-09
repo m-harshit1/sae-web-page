@@ -137,7 +137,7 @@ export default function VehicleView3D() {
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             SolidWorks AP203 CAD Online
           </span>
-          <span>Mesh Faces: 107,556 Polygons (Full Vehicle Model)</span>
+          <span>Mesh Faces: 910,449 Polygons (Continuous Solid Assembly)</span>
           <span>Source: BAJA_FULL_ASSEMBB;Y.STEP (257 MB)</span>
         </div>
       </div>
