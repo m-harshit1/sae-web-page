@@ -440,7 +440,7 @@ export default function PortalTab() {
                     }}
                     className="px-2 py-0.5 bg-carbon-900 hover:bg-torque-orange/20 hover:text-torque-orange border border-white/10 rounded cursor-pointer transition-all"
                   >
-                    Roshanth (SAEBAJA-2026-002)
+                    Ramakrishna (SAEBAJA-2026-002)
                   </button>
                   <button
                     type="button"

@@ -28,10 +28,10 @@ async function main() {
     },
     {
       membershipId: 'SAEBAJA-2026-002',
-      name: 'N M Roshanth',
-      role: 'Club Vice-President / Drivetrain Lead',
+      name: 'Ramakrishna Sen',
+      role: 'Vice President / Drivetrain Lead',
       department: 'Executive Board',
-      email: 'roshanth.nm@iiitk.ac.in',
+      email: 'ramakrishna.sen@iiitk.ac.in',
       yearJoined: 2023
     },
     {
@@ -128,7 +128,7 @@ async function main() {
     await prisma.task.createMany({
       data: [
         { title: "Chassis Roll Cage FEA Validation", assignee: "V. Akash", priority: "High", status: "Done" },
-        { title: "CVT Secondary Sheave Preload Tuning", assignee: "N M Roshanth", priority: "High", status: "In-Progress" },
+        { title: "CVT Secondary Sheave Preload Tuning", assignee: "Ramakrishna Sen", priority: "High", status: "In-Progress" },
         { title: "Brake Over-Travel Switch Calibration", assignee: "Samarth Sakhale", priority: "Medium", status: "Todo" },
         { title: "Emergency Kill Switch Wiring Harness", assignee: "Sneha Nair", priority: "High", status: "Done" }
       ]
@@ -153,8 +153,8 @@ async function main() {
   if (attCount === 0) {
     await prisma.attendanceRecord.createMany({
       data: [
-        { name: "Harshit Kumar Mishra", hours: 42.5, role: "Club President", status: "Present" },
-        { name: "N M Roshanth", hours: 38.0, role: "Vice-President", status: "Present" },
+        { name: "Harshit Mishra", hours: 42.5, role: "President", status: "Present" },
+        { name: "Ramakrishna Sen", hours: 38.0, role: "Vice President", status: "Present" },
         { name: "Vineet Sharma", hours: 35.0, role: "Technical Head", status: "Present" },
         { name: "V. Akash", hours: 29.5, role: "Chassis Lead", status: "Present" }
       ]
