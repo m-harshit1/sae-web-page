@@ -1,7 +1,6 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Download } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
@@ -9,22 +8,9 @@ import { OrbitControls, Html } from '@react-three/drei';
 import VehicleMeshPipeline from '@/components/3d/VehicleMeshPipeline';
 
 export default function BajaWorkspace3D() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  
-  // Tie the 3D rendering view context directly to your URL search query string
-  const activeSubtab = searchParams.get('subtab') || 'overview';
-  const explosionLevel = parseFloat(searchParams.get('explode') || '0.0');
-
-  const updateExplosionValue = (val: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('explode', val);
-    router.push(`?${params.toString()}`, { scroll: false });
-  };
-
   return (
     <div className="w-full h-screen bg-[#0D0E10] text-[#F3F4F6] relative overflow-hidden flex flex-col font-sans">
-      
+
       {/* --- HUD HEADER STATUS PANEL --- */}
       <header className="w-full h-16 bg-[#0D0E10]/90 backdrop-blur-md border-b border-[#1E2025] px-6 flex items-center justify-between z-10 font-mono text-xs">
         <div className="flex items-center space-x-4">
@@ -36,13 +22,10 @@ export default function BajaWorkspace3D() {
           </Link>
           <div className="flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#E11D48] animate-pulse" />
-            <span className="font-bold tracking-widest text-sm uppercase hidden sm:inline">B-26 CAD CORE // RENDERING MATRIX</span>
+            <span className="font-bold tracking-widest text-sm uppercase hidden sm:inline">B-26 CAD CORE // FULL VEHICLE ASSEMBLY</span>
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <div className="text-gray-400 hidden md:block">
-            FOCUS AXIS: <span className="text-[#0EA5E9] uppercase font-bold">{activeSubtab}</span>
-          </div>
           <a
             href="/api/cad/download"
             download="BAJA_B26_FULL_ASSEMBLY.STEP"
@@ -57,44 +40,46 @@ export default function BajaWorkspace3D() {
 
       {/* --- CORE GRAPHICS ENGINE WORKSPACE VIEWPORT --- */}
       <div className="flex-1 relative w-full h-full">
-        <Canvas camera={{ position: [0, 2.5, 6], fov: 45 }} gl={{ antialias: true }}>
-          <ambientLight intensity={0.35} />
-          <pointLight position={[10, 15, 10]} intensity={1.2} />
-          <directionalLight position={[-5, 10, -2]} intensity={0.7} color="#0EA5E9" />
-          
+        <Canvas camera={{ position: [3.2, 2.2, 4.2], fov: 45 }} gl={{ antialias: true }}>
+          <color attach="background" args={['#0D0F13']} />
+
+          {/* High-Visibility Multi-directional Lighting */}
+          <ambientLight intensity={1.8} />
+          <directionalLight position={[10, 15, 10]} intensity={2.5} color="#FFFFFF" />
+          <directionalLight position={[-10, 12, -10]} intensity={2.0} color="#E2E8F0" />
+          <directionalLight position={[-10, 8, 10]} intensity={1.8} color="#FFFFFF" />
+          <directionalLight position={[0, -8, 2]} intensity={1.2} color="#94A3B8" />
+          <directionalLight position={[0, 10, 8]} intensity={2.2} color="#FFFFFF" />
+          <pointLight position={[0, 6, 0]} intensity={1.5} color="#FFF1F2" />
+
           <Suspense fallback={
             <Html center>
-              <div className="font-mono text-xs text-gray-500 bg-[#1E2025] px-4 py-3 border border-gray-800 rounded-sm uppercase tracking-widest animate-pulse">
-                Compiling WebGL Geometry Buffers...
+              <div className="font-mono text-xs text-slate-300 bg-[#1E2025] px-4 py-3 border border-gray-800 rounded-sm uppercase tracking-widest animate-pulse">
+                Hydrating Full Vehicle Assembly...
               </div>
             </Html>
           }>
-            <VehicleMeshPipeline activeSubtab={activeSubtab} explosionLevel={explosionLevel} />
+            <VehicleMeshPipeline activeSubtab="overview" explosionLevel={0} />
           </Suspense>
 
-          <OrbitControls 
+          {/* Ground Grid Floor */}
+          <gridHelper args={[12, 24, '#FF334B', '#232730']} position={[0, -1.4, 0]} />
+
+          <OrbitControls
             enableZoom={true}
-            maxDistance={9}
-            minDistance={2.5}
+            maxDistance={10}
+            minDistance={2}
+            autoRotate={true}
+            autoRotateSpeed={1.0}
             maxPolarAngle={Math.PI / 2 + 0.05}
           />
         </Canvas>
 
-        {/* --- EXPLOSION DISPLACEMENT SLIDER CONTROL HUB --- */}
-        <div className="absolute bottom-6 left-6 right-6 sm:left-auto sm:right-6 sm:w-80 bg-[#1E2025]/90 backdrop-blur-md p-4 border border-gray-800 rounded-sm font-mono z-10">
-          <div className="flex justify-between text-[10px] text-gray-400 uppercase tracking-widest mb-2 select-none">
-            <span>Assembly Separation</span>
-            <span className="text-[#E11D48] font-bold">{(explosionLevel * 100).toFixed(0)}% Exploded</span>
+        {/* Navigation Info Pill */}
+        <div className="absolute bottom-5 right-5 pointer-events-none hidden sm:block">
+          <div className="font-mono text-[10px] text-slate-400 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded border border-white/10">
+            🖱️ Click &amp; drag to rotate • Scroll to zoom • Right-click to pan
           </div>
-          <input 
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={explosionLevel}
-            onChange={(e) => updateExplosionValue(e.target.value)}
-            className="w-full accent-[#E11D48] bg-[#0D0E10] h-1 rounded-sm appearance-none cursor-ew-resize outline-none"
-          />
         </div>
       </div>
     </div>

@@ -318,51 +318,29 @@ export default function ProjectsTab() {
             {activeSubTab === "3d_view" && (
               <div className="pt-4 animate-fadeIn space-y-4">
                 
-                {/* Link to the new Fullscreen Workspace & CAD Download */}
-                <div className="w-full bg-apex-red/10 border border-apex-red/30 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                {/* CAD Download Banner */}
+                <div className="w-full bg-[#1E2025]/60 border border-white/10 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div>
                     <h4 className="font-heading font-black text-white text-lg uppercase flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-apex-red animate-pulse" />
-                      Emergent 3D Workspace &amp; SolidWorks CAD
+                      <span className="w-2 h-2 rounded-full bg-torque-orange animate-pulse" />
+                      SolidWorks 3D CAD Assembly
                     </h4>
                     <p className="text-slate-400 font-mono text-[10px] sm:text-xs uppercase mt-1">
-                      Explore interactive WebGL CAD or download full SolidWorks AP203 STEP assembly (257 MB)
+                      Full BAJA B-26 vehicle model with chassis, powertrain, double-wishbone suspension, and cockpit
                     </p>
                   </div>
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <a 
-                      href="/api/cad/download" 
-                      download="BAJA_B26_FULL_ASSEMBLY.STEP"
-                      className="flex-1 sm:flex-initial px-4 py-3 bg-[#1E2025] hover:bg-white/10 text-slate-200 border border-white/20 font-bold font-mono text-xs uppercase rounded transition-colors whitespace-nowrap flex items-center justify-center gap-2 text-center cursor-pointer"
-                    >
-                      <Download size={14} className="text-torque-orange" />
-                      Download CAD (.STEP)
-                    </a>
-                    <a 
-                      href="/baja" 
-                      className="flex-1 sm:flex-initial px-6 py-3 bg-apex-red text-white font-bold font-mono text-xs uppercase rounded hover:bg-apex-red/80 transition-colors whitespace-nowrap shrink-0 text-center cursor-pointer"
-                    >
-                      Launch Workspace ↗
-                    </a>
-                  </div>
+                  <a 
+                    href="/api/cad/download" 
+                    download="BAJA_B26_FULL_ASSEMBLY.STEP"
+                    className="w-full sm:w-auto px-5 py-3 bg-[#F97316]/15 hover:bg-[#F97316] text-[#F97316] hover:text-white border border-[#F97316]/30 font-bold font-mono text-xs uppercase rounded transition-all whitespace-nowrap flex items-center justify-center gap-2 text-center cursor-pointer"
+                  >
+                    <Download size={14} />
+                    Download CAD (.STEP — 257 MB)
+                  </a>
                 </div>
 
                 <div className="border border-white/5 rounded-xl overflow-hidden bg-carbon-900/50 p-2">
-                  <VehicleView3D activeSubsystem={activeHotspot} />
-                </div>
-                
-                <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
-                  {Object.keys(specHotspots).map((key) => (
-                    <button
-                      key={key}
-                      onClick={() => setActiveHotspot(key)}
-                      className={`px-3 py-1.5 rounded-full font-mono text-[10px] uppercase font-bold tracking-widest transition-all cursor-pointer border ${
-                        activeHotspot === key ? "bg-apex-red text-white border-apex-red" : "bg-transparent text-slate-400 border-white/10 hover:border-white/30"
-                      }`}
-                    >
-                      {specHotspots[key].title.split('&')[0].trim()}
-                    </button>
-                  ))}
+                  <VehicleView3D />
                 </div>
               </div>
             )}

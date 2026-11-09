@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useGLTF, Html } from '@react-three/drei';
+import { useGLTF, Html, Center } from '@react-three/drei';
 import * as THREE from 'three';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -29,52 +29,31 @@ function ModelWithRaycasting({ activeSubtab, explosionLevel }: Props) {
   // Attempt to load CAD file
   const gltf = useGLTF('/assets/b26_compressed.glb');
 
-  const triggerNavigation = (subtab: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('subtab', subtab);
-    router.push(`?${params.toString()}`, { scroll: false });
-  };
-
-  useFrame(() => {
-    if (!modelRef.current) return;
-
-    // --- EXPLOSION VECTOR DISPLACEMENT LOGIC ---
-    modelRef.current.traverse((child) => {
+  React.useLayoutEffect(() => {
+    if (!gltf.scene) return;
+    gltf.scene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
-        const name = child.name.toLowerCase();
-        
-        if (name.includes('chassis') || name.includes('rollcage')) {
-          child.position.y = THREE.MathUtils.lerp(child.position.y, explosionLevel * 1.5, 0.1);
+        const mesh = child as THREE.Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        if (mesh.geometry) {
+          mesh.geometry.computeVertexNormals();
         }
-        if (name.includes('powertrain') || name.includes('engine') || name.includes('gearbox')) {
-          child.position.z = THREE.MathUtils.lerp(child.position.z, explosionLevel * -1.8, 0.1);
-        }
-        if (name.includes('suspension') || name.includes('wishbone')) {
-          const side = child.position.x > 0 ? 1 : -1;
-          child.position.x = THREE.MathUtils.lerp(child.position.x, side * explosionLevel * 1.2, 0.1);
-        }
-
-        // Apply glow to hovered element
-        if (child.name === hoveredNode) {
-          (child as THREE.Mesh).scale.setScalar(1.05);
-        } else {
-          (child as THREE.Mesh).scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
-        }
+        mesh.material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color('#FF334B'),
+          metalness: 0.6,
+          roughness: 0.3,
+          side: THREE.DoubleSide,
+        });
       }
     });
-
-    // --- DYNAMIC CAMERA RIGGING ---
-    const target = CAMERA_RIG[activeSubtab] || CAMERA_RIG.overview;
-    camera.position.lerp(target.pos, 0.05);
-    if (controls) {
-      const ctrlTarget = (controls as any).target as THREE.Vector3;
-      ctrlTarget.lerp(target.lookAt, 0.05);
-    }
-  });
+  }, [gltf]);
 
   return (
-    <group ref={modelRef} scale={1.5} position={[0, -1, 0]}>
-      <primitive object={gltf.scene} />
+    <group ref={modelRef}>
+      <Center>
+        <primitive object={gltf.scene} />
+      </Center>
     </group>
   );
 }
