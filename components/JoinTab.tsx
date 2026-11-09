@@ -417,7 +417,7 @@ export default function JoinTab() {
                         required
                         value={applicantName}
                         onChange={(e) => setApplicantName(e.target.value)}
-                        placeholder="e.g. Aman Gupta"
+                        placeholder="e.g. Student Full Name"
                         className="w-full bg-carbon-900 border border-white/10 p-3 rounded text-white focus:outline-none focus:border-apex-red transition-all"
                       />
                     </div>

@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Award, Mail, Wrench, Shield, Flag, Compass, Zap, Users, Briefcase } from 'lucide-react';
+import { Award, Mail, Wrench, Shield, Flag, Compass, Zap, Users, Briefcase, UserPlus } from 'lucide-react';
 import { 
-  chapterOfficers, facultyAdvisors, subsystemLeads, 
-  managementTeam, bajaTeam, TeamMember 
+  chapterOfficers, facultyAdvisors, bajaTeam, TeamMember, BajaMember 
 } from '@/data/teamData';
 
 const Linkedin = ({ size = 24, ...props }: React.ComponentPropsWithoutRef<'svg'> & { size?: number }) => (
@@ -25,19 +24,55 @@ export default function TeamsTab() {
   // BAJA team subsystem filter
   const [bajaFilter, setBajaFilter] = useState<string>("all");
 
+  // Dynamic custom members added via Portal by Administrator
+  const [customMembers, setCustomMembers] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    const loadCustom = () => {
+      try {
+        const stored = localStorage.getItem("sae_custom_roster_members");
+        if (stored) {
+          setCustomMembers(JSON.parse(stored));
+        }
+      } catch (err) {
+        console.error("Failed to load custom members", err);
+      }
+    };
+    loadCustom();
+    window.addEventListener("sae_members_updated", loadCustom);
+    return () => window.removeEventListener("sae_members_updated", loadCustom);
+  }, []);
+
+  const allOfficers = [...chapterOfficers, ...customMembers.filter(m => m.subteam === "Chapter Officers")];
+  const allAdvisors = [...facultyAdvisors, ...customMembers.filter(m => m.subteam === "Academic Advisory")];
+  const dynamicMembers = customMembers.filter(m => m.subteam !== "Chapter Officers" && m.subteam !== "Academic Advisory");
+
   const getFilteredMembers = () => {
     switch (activeTab) {
-      case "officers": return chapterOfficers;
-      case "faculty": return facultyAdvisors;
-      case "technical": return subsystemLeads;
-      case "management": return managementTeam;
-      default: return [...chapterOfficers, ...facultyAdvisors, ...subsystemLeads, ...managementTeam];
+      case "officers": return allOfficers;
+      case "faculty": return allAdvisors;
+      case "custom": return customMembers;
+      default: return [...allOfficers, ...allAdvisors, ...dynamicMembers];
     }
   };
 
+  const customBajaMembers: BajaMember[] = customMembers
+    .filter(m => m.subteam === "Team Monarch Racing" || m.subteam === "BAJA Division")
+    .map(m => ({
+      name: m.name,
+      role: m.role,
+      subsystem: "Management" as const,
+      responsibility: "Appointed race team crew member contributing to vehicle engineering and competition readiness.",
+      initials: m.initials,
+      email: m.email || "",
+      accent: "border-torque-orange/40 bg-torque-orange/10 text-torque-orange"
+    }));
+
+  const allBajaCrew = [...bajaTeam, ...customBajaMembers];
+
   const getFilteredBajaCrew = () => {
-    if (bajaFilter === "all") return bajaTeam;
-    return bajaTeam.filter(m => m.subsystem.toLowerCase() === bajaFilter.toLowerCase());
+    if (bajaFilter === "all") return allBajaCrew;
+    return allBajaCrew.filter(m => m.subsystem.toLowerCase() === bajaFilter.toLowerCase());
   };
 
   return (
@@ -66,7 +101,7 @@ export default function TeamsTab() {
           }`}
         >
           <Flag size={14} />
-          <span>BAJA Racing Team (B-26 Crew)</span>
+          <span>Team Monarch Racing (BAJA)</span>
         </button>
 
         <button
@@ -109,12 +144,23 @@ export default function TeamsTab() {
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-torque-orange animate-pulse" />
                   <span className="font-mono text-xs font-bold uppercase tracking-widest text-torque-orange">
-                    Official National Campaign Team // IIITDM Kurnool
+                    National Campaign Squad // IIITDM Kurnool
                   </span>
                 </div>
-                <h3 className="font-heading font-black text-2xl sm:text-4xl text-white uppercase tracking-tight">
-                  TEAM BLITZKRIEG // BAJA RACING CREW
-                </h3>
+
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 pt-1">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-black/70 border border-torque-orange/50 p-2 shrink-0 flex items-center justify-center shadow-xl shadow-torque-orange/15 backdrop-blur-md">
+                    <img src="/monarch_logo.png" alt="Team Monarch Racing" className="w-full h-full object-contain drop-shadow" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading font-black text-2xl sm:text-4xl text-white uppercase tracking-tight">
+                      TEAM MONARCH RACING
+                    </h3>
+                    <span className="font-mono text-xs text-slate-300 font-bold uppercase tracking-wider block mt-0.5">
+                      Raw Power. Precision Engineering. // mBAJA SAEINDIA
+                    </span>
+                  </div>
+                </div>
                 <p className="text-slate-300 font-sans text-xs sm:text-sm max-w-2xl leading-relaxed">
                   The specialized vehicle engineering and race operations squad fabricating, tuning, and defending the 
                   <strong className="text-white"> B-26 4WD All-Terrain Vehicle</strong> at national BAJA SAEINDIA 2026.
@@ -456,76 +502,16 @@ export default function TeamsTab() {
                   <span className="text-slate-500 text-[10px] block mt-0.5 font-sans">Workshops &amp; AWIM</span>
                 </div>
               </div>
-
-              <div className="flex justify-center">
-                <div className="w-0.5 h-6 bg-white/10"></div>
-              </div>
-
-              {/* Subsystems & Management Division */}
-              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                <div className="bg-[#1E2025]/50 border border-white/10 p-5 rounded-lg space-y-3">
-                  <span className="font-heading font-extrabold text-xs text-slate-400 uppercase tracking-widest block border-b border-white/5 pb-1">
-                    ENGINEERING SUBSYSTEM LEADS
-                  </span>
-                  <div className="space-y-2 font-sans text-xs">
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>Chassis &amp; Structure</span>
-                      <strong className="text-white font-mono font-bold uppercase">V. Akash</strong>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>Suspension &amp; Geometry</span>
-                      <strong className="text-white font-mono font-bold uppercase">Vineet Sharma</strong>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>Drivetrain &amp; Transmission</span>
-                      <strong className="text-white font-mono font-bold uppercase">Ramakrishna Sen</strong>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>Brakes &amp; Steering</span>
-                      <strong className="text-white font-mono font-bold uppercase">Samarth Sakhale</strong>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>Electrical &amp; DAQ</span>
-                      <strong className="text-white font-mono font-bold uppercase">Sneha Nair</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-[#1E2025]/50 border border-white/10 p-5 rounded-lg space-y-3">
-                  <span className="font-heading font-extrabold text-xs text-slate-400 uppercase tracking-widest block border-b border-white/5 pb-1">
-                    OPERATIONS &amp; LOGISTICS CREW
-                  </span>
-                  <div className="space-y-2 font-sans text-xs">
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>Sponsors &amp; CSR Outreach</span>
-                      <strong className="text-white font-mono font-bold uppercase">Priya Patel</strong>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>Finances &amp; Tool Inventory</span>
-                      <strong className="text-white font-mono font-bold uppercase">Aman Sharma</strong>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>PR, Media &amp; Graphic Design</span>
-                      <strong className="text-white font-mono font-bold uppercase">Rohan Verma</strong>
-                    </div>
-                    <div className="flex justify-between items-center text-slate-300">
-                      <span>AWIM School Outreach</span>
-                      <strong className="text-white font-mono font-bold uppercase">Sneha Nair</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
           {/* Directory Filter Buttons */}
           <div className="flex flex-wrap justify-center border-b border-white/10 pb-4 gap-2 font-mono text-xs">
             {[
-              { key: "all", label: "All Directory" },
-              { key: "officers", label: "Chapter Officers (8)" },
-              { key: "faculty", label: "Faculty Supervisors (2)" },
-              { key: "technical", label: "Engineering Leads (5)" },
-              { key: "management", label: "Operations Team (3)" }
+              { key: "all", label: `All Directory (${allOfficers.length + allAdvisors.length + dynamicMembers.length})` },
+              { key: "officers", label: `Chapter Officers (${allOfficers.length})` },
+              { key: "faculty", label: `Faculty Supervisors (${allAdvisors.length})` },
+              ...(customMembers.length > 0 ? [{ key: "custom", label: `Admin Added (${customMembers.length})` }] : [])
             ].map((btn) => (
               <button
                 key={btn.key}
@@ -645,7 +631,7 @@ export default function TeamsTab() {
                 onClick={() => setActiveSegment("baja")}
                 className="px-6 py-3 bg-torque-orange hover:bg-torque-orange/90 text-white font-mono text-xs uppercase font-bold rounded-lg transition-all cursor-pointer shadow-lg shadow-torque-orange/20 inline-flex items-center gap-2"
               >
-                <span>View BAJA Racing Team (B-26 Crew)</span>
+                <span>View Team Monarch Racing (BAJA Squad)</span>
                 <span>→</span>
               </button>
             </div>

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { 
   Plus, Trash2, Shield, Calendar, Wrench, 
-  Clock, Users, ShieldAlert, Lock, CheckCircle2
+  Clock, Users, ShieldAlert, Lock, CheckCircle2, UserPlus
 } from 'lucide-react';
 
 interface Task {
@@ -70,8 +70,10 @@ export default function PortalTab() {
 
   const [newMemberName, setNewMemberName] = useState<string>("");
   const [newMemberRole, setNewMemberRole] = useState<string>("");
-  const [newMemberDept, setNewMemberDept] = useState<string>("BAJA Division");
+  const [newMemberDept, setNewMemberDept] = useState<string>("Team Monarch Racing");
+  const [newMemberEmail, setNewMemberEmail] = useState<string>("");
   const [newMemberMembershipId, setNewMemberMembershipId] = useState<string>("");
+  const [memberSuccessMsg, setMemberSuccessMsg] = useState<string>("");
 
   const [newInventoryName, setNewInventoryName] = useState<string>("");
   const [newInventoryQty, setNewInventoryQty] = useState<string>("");
@@ -213,31 +215,75 @@ export default function PortalTab() {
   // Member actions (Admin only)
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMemberName.trim() || !newMemberRole.trim()) return;
-    const res = await fetch('/api/members', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: newMemberName,
-        role: newMemberRole,
-        department: newMemberDept,
-        membershipId: newMemberMembershipId.trim() || `SAEBAJA-2026-${String(members.length + 1).padStart(3, '0')}`,
-        email: `${newMemberName.toLowerCase().replace(/\s+/g, "")}@iiitk.ac.in`,
-        yearJoined: new Date().getFullYear()
-      })
-    });
-    if (res.ok) {
-      const member = await res.json();
-      setMembers([...members, member]);
-      setNewMemberName("");
-      setNewMemberRole("");
-      setNewMemberMembershipId("");
+    const finalName = newMemberName.trim();
+    const finalRole = newMemberRole.trim();
+    if (!finalName || !finalRole) return;
+
+    const finalDept = newMemberDept || "Team Monarch Racing";
+    const finalEmail = newMemberEmail.trim() || `${finalName.toLowerCase().replace(/\s+/g, ".")}@iiitk.ac.in`;
+    const finalId = newMemberMembershipId.trim() || `SAEBAJA-2026-${String(members.length + 1).padStart(3, '0')}`;
+
+    try {
+      const res = await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: finalName,
+          role: finalRole,
+          department: finalDept,
+          membershipId: finalId,
+          email: finalEmail,
+          yearJoined: new Date().getFullYear()
+        })
+      });
+      if (res.ok) {
+        const member = await res.json();
+        setMembers(prev => [...prev, member]);
+      }
+    } catch (err) {
+      console.warn("API write skipped:", err);
     }
+
+    // Live sync to public website roster via localStorage and custom event
+    const customMember = {
+      id: "mem_" + Date.now(),
+      name: finalName,
+      role: finalRole,
+      subteam: finalDept,
+      email: finalEmail,
+      initials: finalName.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+    };
+    try {
+      const existing = JSON.parse(localStorage.getItem('sae_custom_roster_members') || '[]');
+      const updated = [...existing.filter((m: any) => m.name.toLowerCase() !== finalName.toLowerCase()), customMember];
+      localStorage.setItem('sae_custom_roster_members', JSON.stringify(updated));
+      window.dispatchEvent(new Event('sae_members_updated'));
+    } catch (err) {
+      console.error(err);
+    }
+
+    setMemberSuccessMsg(`✓ ${finalName} successfully added to the website roster under "${finalDept}"!`);
+    setTimeout(() => setMemberSuccessMsg(""), 4500);
+
+    setNewMemberName("");
+    setNewMemberRole("");
+    setNewMemberEmail("");
+    setNewMemberMembershipId("");
   };
 
-  const handleDeleteMember = async (id: string) => {
-    const res = await fetch(`/api/members/${id}`, { method: 'DELETE' });
-    if (res.ok) setMembers(members.filter(m => m.id !== id));
+  const handleDeleteMember = async (id: string, memberName?: string) => {
+    try {
+      await fetch(`/api/members/${id}`, { method: 'DELETE' });
+    } catch (err) {}
+    setMembers(prev => prev.filter(m => m.id !== id));
+    try {
+      const existing = JSON.parse(localStorage.getItem('sae_custom_roster_members') || '[]');
+      const updated = existing.filter((m: any) => m.id !== id && (!memberName || m.name.toLowerCase() !== memberName.toLowerCase()));
+      localStorage.setItem('sae_custom_roster_members', JSON.stringify(updated));
+      window.dispatchEvent(new Event('sae_members_updated'));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   // Inventory actions (Admin only)
@@ -719,9 +765,9 @@ export default function PortalTab() {
 
                   {isAdmin && (
                     <button
-                      onClick={() => handleDeleteMember(member.id)}
+                      onClick={() => handleDeleteMember(member.id, member.name)}
                       className="p-1.5 text-slate-400 hover:text-apex-red transition-colors cursor-pointer"
-                      title="Remove member (Admin only)"
+                      title="Remove member from database & website roster"
                     >
                       <Trash2 size={13} />
                     </button>
@@ -731,51 +777,77 @@ export default function PortalTab() {
             </div>
 
             {isAdmin ? (
-              <form onSubmit={handleAddMember} className="border-t border-white/5 pt-4 space-y-2 font-mono text-xs">
+              <form onSubmit={handleAddMember} className="border-t border-white/5 pt-4 space-y-2.5 font-mono text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-apex-red font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <UserPlus size={12} />
+                    <span>ADMIN: ADD NEW NAME TO WEBSITE ROSTER</span>
+                  </span>
+                  <span className="text-[9px] text-slate-400">Live Website Sync</span>
+                </div>
+
+                {memberSuccessMsg && (
+                  <div className="p-2 bg-emerald-500/15 border border-emerald-500/30 rounded text-emerald-400 text-[10px] font-bold">
+                    {memberSuccessMsg}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-2">
                   <input 
                     type="text" 
                     required
                     value={newMemberName}
                     onChange={(e) => setNewMemberName(e.target.value)}
-                    placeholder="Full name"
-                    className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
+                    placeholder="Full Name (e.g. Rahul Sharma)"
+                    className="bg-carbon-900 border border-white/10 p-2 rounded text-white focus:outline-none"
                   />
                   <input 
                     type="text" 
                     required
                     value={newMemberRole}
                     onChange={(e) => setNewMemberRole(e.target.value)}
-                    placeholder="Position role"
-                    className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none"
+                    placeholder="Role (e.g. Aerodynamics Lead)"
+                    className="bg-carbon-900 border border-white/10 p-2 rounded text-white focus:outline-none"
                   />
                 </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={newMemberDept}
+                    onChange={(e) => setNewMemberDept(e.target.value)}
+                    className="bg-carbon-900 border border-white/10 p-2 rounded text-white focus:outline-none cursor-pointer"
+                  >
+                    <option value="Team Monarch Racing">Team Monarch Racing (BAJA Squad)</option>
+                    <option value="Chapter Officers">Chapter Officers (Office Section)</option>
+                    <option value="Academic Advisory">Academic Advisory (Faculty)</option>
+                    <option value="General Engineering Roster">General Engineering Roster</option>
+                  </select>
+
+                  <input 
+                    type="email" 
+                    value={newMemberEmail}
+                    onChange={(e) => setNewMemberEmail(e.target.value)}
+                    placeholder="Email (e.g. name@iiitk.ac.in)"
+                    className="bg-carbon-900 border border-white/10 p-2 rounded text-white focus:outline-none"
+                  />
+                </div>
+
                 <div className="grid grid-cols-2 gap-2">
                   <input 
                     type="text" 
                     value={newMemberMembershipId}
                     onChange={(e) => setNewMemberMembershipId(e.target.value)}
-                    placeholder="ID (e.g. SAEBAJA-2026-011)"
-                    className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none uppercase"
+                    placeholder="ID (optional e.g. SAEBAJA-2026-009)"
+                    className="bg-carbon-900 border border-white/10 p-2 rounded text-white focus:outline-none uppercase"
                   />
-                  <select
-                    value={newMemberDept}
-                    onChange={(e) => setNewMemberDept(e.target.value)}
-                    className="bg-carbon-900 border border-white/10 p-2.5 rounded text-white focus:outline-none cursor-pointer"
+                  <button
+                    type="submit"
+                    className="bg-apex-red hover:bg-apex-red/90 text-white font-bold uppercase py-2 px-3 rounded flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-apex-red/20 transition-all text-[11px]"
                   >
-                    <option value="BAJA Division">BAJA Division</option>
-                    <option value="Formula Student">Formula Student Division</option>
-                    <option value="Aero Design">Aero Design Division</option>
-                    <option value="Executive Board">Executive Board</option>
-                  </select>
+                    <Plus size={14} />
+                    <span>ADD TO WEBSITE ROSTER</span>
+                  </button>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full bg-apex-red/10 border border-apex-red hover:bg-apex-red hover:text-white text-apex-red font-bold uppercase py-2.5 rounded flex items-center justify-center gap-1 cursor-crosshair transition-all"
-                >
-                  <Plus size={14} />
-                  <span>[ REGISTER MEMBER TO DATABASE ]</span>
-                </button>
               </form>
             ) : (
               <div className="border-t border-white/5 pt-3 text-center">

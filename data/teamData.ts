@@ -1,4 +1,5 @@
 export interface TeamMember {
+  id?: string;
   name: string;
   role: string;
   subteam: string;
@@ -13,7 +14,7 @@ export const facultyAdvisors: TeamMember[] = [
   { name: "Dr. Pankaj Kaushik", role: "Faculty Co-supervisor", subteam: "Academic Advisory", initials: "PK", email: "pankaj@iiitk.ac.in" }
 ];
 
-// Official Chapter Office Bearers (SAEINDIA Collegiate Chapter Leadership)
+// Official Chapter Office Bearers (The only officially appointed officers)
 export const chapterOfficers: TeamMember[] = [
   { name: "Harshit Mishra", role: "President", subteam: "Chapter Officers", initials: "HM", email: "harshit.mishra@iiitk.ac.in", linkedin: "https://linkedin.com" },
   { name: "Ramakrishna Sen", role: "Vice President", subteam: "Chapter Officers", initials: "RS", email: "ramakrishna.sen@iiitk.ac.in", linkedin: "https://linkedin.com" },
@@ -29,20 +30,8 @@ export const chapterOfficers: TeamMember[] = [
 export const officeBearers = chapterOfficers;
 export const executiveBoard: TeamMember[] = chapterOfficers.slice(0, 4);
 export const coreLeadership: TeamMember[] = chapterOfficers.slice(4);
-
-export const subsystemLeads: TeamMember[] = [
-  { name: "V. Akash", role: "Chassis & Roll Cage Lead", subteam: "Chassis", initials: "VA", email: "akash.v@iiitk.ac.in" },
-  { name: "Vineet Sharma", role: "Suspension & Kinematics Lead", subteam: "Suspension", initials: "VS", email: "vineet.sharma@iiitk.ac.in" },
-  { name: "Ramakrishna Sen", role: "Drivetrain & Transmission Lead", subteam: "Powertrain", initials: "RS", email: "ramakrishna.sen@iiitk.ac.in" },
-  { name: "Samarth Sakhale", role: "Brakes & Steering Lead", subteam: "Brakes", initials: "SS", email: "samarth.sakhale@iiitk.ac.in" },
-  { name: "Sneha Nair", role: "Electrical & DAQ Lead", subteam: "Electrical", initials: "SN", email: "sneha.nair@iiitk.ac.in" }
-];
-
-export const managementTeam: TeamMember[] = [
-  { name: "Priya Patel", role: "Sponsorship & Corporate Relations Lead", subteam: "Management", initials: "PP", email: "priya.patel@iiitk.ac.in" },
-  { name: "Aman Sharma", role: "Finance & Inventory Officer", subteam: "Management", initials: "AS", email: "aman.sharma@iiitk.ac.in" },
-  { name: "Rohan Verma", role: "Public Relations & Media Manager", subteam: "Management", initials: "RV", email: "rohan.verma@iiitk.ac.in" }
-];
+export const subsystemLeads: TeamMember[] = [];
+export const managementTeam: TeamMember[] = [];
 
 export interface Alumnus {
   name: string;
@@ -91,54 +80,54 @@ export const bajaTeam: BajaMember[] = [
     name: "Vineet Sharma",
     role: "Vehicle Dynamics & Suspension Lead",
     subsystem: "Suspension",
-    responsibility: "Front and rear double wishbone kinematics, anti-squat / anti-dive geometry, and custom Ohlins 3-way damper valving.",
+    responsibility: "Front and rear double wishbone kinematics, anti-squat / anti-dive geometry, and custom 3-way damper valving.",
     initials: "VS",
     email: "vineet.sharma@iiitk.ac.in",
     accent: "border-lift-blue/40 bg-lift-blue/10 text-lift-blue"
   },
   {
-    name: "V. Akash",
+    name: "Pranjal Mishra",
     role: "Chassis & Roll Cage Lead",
     subsystem: "Chassis",
-    responsibility: "AISI 4030 Chromoly tubular roll cage fabrication, ANSYS FEA impact load modeling (30 kN front brace, SF > 2.0).",
-    initials: "VA",
-    email: "akash.v@iiitk.ac.in",
+    responsibility: "AISI 4030 Chromoly tubular roll cage fabrication, structural triangulation, and ANSYS FEA impact compliance (SF > 2.0).",
+    initials: "PM",
+    email: "pranjal.mishra@iiitk.ac.in",
     accent: "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
   },
   {
-    name: "Samarth Sakhale",
-    role: "Brakes & Steering Lead",
+    name: "Shanu Jha",
+    role: "Brakes & Driver Ergonomics Lead",
     subsystem: "Brakes",
-    responsibility: "Dual-circuit hydraulic master cylinder balancing (78:22 bias), SS410 laser-cut rotors, and custom rack & pinion steering.",
-    initials: "SS",
-    email: "samarth.sakhale@iiitk.ac.in",
+    responsibility: "Dual-circuit hydraulic master cylinder balancing (78:22 bias), pedal box ergonomics, and emergency braking lockup validation.",
+    initials: "SJ",
+    email: "shanu.jha@iiitk.ac.in",
     accent: "border-amber-500/40 bg-amber-500/10 text-amber-400"
   },
   {
-    name: "Sneha Nair",
-    role: "Electronics, DAQ & Safety Lead",
+    name: "Jatin Sharma",
+    role: "Electronics, DAQ & Publicity Lead",
     subsystem: "Electronics",
-    responsibility: "Brake over-travel safety switches, emergency kill switch circuit, Hall-effect telemetry node, and live pit data acquisition.",
-    initials: "SN",
-    email: "sneha.nair@iiitk.ac.in",
+    responsibility: "Over-travel brake switches, kill-switch wiring harness, telemetry data logging node, and media documentation.",
+    initials: "JS",
+    email: "jatin.sharma@iiitk.ac.in",
     accent: "border-cyan-500/40 bg-cyan-500/10 text-cyan-400"
   },
   {
-    name: "Priya Patel",
-    role: "BAJA Team Manager & Logistics",
+    name: "Prashant Kumar",
+    role: "Safety, Scrutineering & Pit Manager",
     subsystem: "Management",
-    responsibility: "BAJA SAEINDIA rulebook compliance auditing, technical inspection readiness, and national competition logistics.",
-    initials: "PP",
-    email: "priya.patel@iiitk.ac.in",
+    responsibility: "BAJA SAEINDIA technical inspection compliance, driver safety gear audit, pit stop tools, and paddock reception logistics.",
+    initials: "PK",
+    email: "prashant.kumar@iiitk.ac.in",
     accent: "border-purple-500/40 bg-purple-500/10 text-purple-400"
   },
   {
-    name: "Aman Sharma",
-    role: "Cost & Manufacturing Lead",
+    name: "Karthikeya",
+    role: "Program & Race Telemetry Coordinator",
     subsystem: "Management",
-    responsibility: "Bill of Materials (BOM) defense, engineering cost report, CNC part machining, and workshop tool scheduling.",
-    initials: "AS",
-    email: "aman.sharma@iiitk.ac.in",
+    responsibility: "Track trial timing, endurance race fuel stint planning, AWIM program outreach, and dynamic trial schedules.",
+    initials: "KT",
+    email: "karthikeya@iiitk.ac.in",
     accent: "border-rose-500/40 bg-rose-500/10 text-rose-400"
   }
 ];
