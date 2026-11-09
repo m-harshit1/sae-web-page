@@ -19,15 +19,18 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session || (session.user as any)?.role !== 'Admin') {
+      return NextResponse.json({ error: 'Unauthorized. Admin credentials required.' }, { status: 401 });
     }
     const { title, assignee, priority } = await req.json();
+    if (!title || typeof title !== 'string' || !title.trim()) {
+      return NextResponse.json({ error: 'Valid title is required' }, { status: 400 });
+    }
     const task = await prisma.task.create({
       data: {
-        title,
-        assignee,
-        priority,
+        title: title.trim().slice(0, 200),
+        assignee: (assignee || 'Unassigned').toString().trim().slice(0, 100),
+        priority: ['High', 'Medium', 'Low'].includes(priority) ? priority : 'Medium',
         status: "Todo"
       }
     });

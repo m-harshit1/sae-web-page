@@ -19,15 +19,18 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session || (session.user as any)?.role !== 'Admin') {
+      return NextResponse.json({ error: 'Unauthorized. Admin credentials required.' }, { status: 401 });
     }
     const { name, qty, dept } = await req.json();
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return NextResponse.json({ error: 'Valid component name is required' }, { status: 400 });
+    }
     const item = await prisma.inventoryItem.create({
       data: {
-        name,
-        qty,
-        dept,
+        name: name.trim().slice(0, 100),
+        qty: (qty || '1 unit').toString().trim().slice(0, 50),
+        dept: (dept || 'General').toString().trim().slice(0, 50),
         status: "In Stock"
       }
     });

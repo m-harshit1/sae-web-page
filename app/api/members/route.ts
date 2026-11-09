@@ -19,20 +19,23 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session || (session.user as any)?.role !== 'Admin') {
+      return NextResponse.json({ error: 'Unauthorized. Admin credentials required.' }, { status: 401 });
     }
     const { name, role, department, email, yearJoined, membershipId } = await req.json();
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return NextResponse.json({ error: 'Valid member name is required' }, { status: 400 });
+    }
     const finalMembershipId = membershipId?.trim() 
-      ? membershipId.trim().toUpperCase() 
+      ? membershipId.trim().toUpperCase().slice(0, 30)
       : `SAEBAJA-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
 
     const member = await prisma.member.create({
       data: {
         membershipId: finalMembershipId,
-        name,
-        role,
-        department,
+        name: name.trim().slice(0, 100),
+        role: (role || 'Member').toString().trim().slice(0, 100),
+        department: (department || 'BAJA Division').toString().trim().slice(0, 100),
         email: email || `${name.toLowerCase().replace(/\s+/g, '.')}-${Date.now()}@iiitk.ac.in`,
         yearJoined: parseInt(yearJoined) || new Date().getFullYear()
       }

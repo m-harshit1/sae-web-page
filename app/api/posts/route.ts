@@ -38,23 +38,30 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const posts = readPosts();
-
-    // Validate session server-side for publishing
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Authentication required. Please sign in.' }, { status: 401 });
+    if (!session || (session.user as any)?.role !== 'Admin') {
+      return NextResponse.json({ error: 'Unauthorized. Admin credentials required to publish bulletins.' }, { status: 401 });
     }
 
+    const body = await request.json();
+    if (!body.title || typeof body.title !== 'string' || !body.title.trim()) {
+      return NextResponse.json({ error: 'Post title is required' }, { status: 400 });
+    }
+    if (!body.content || typeof body.content !== 'string' || !body.content.trim()) {
+      return NextResponse.json({ error: 'Post content is required' }, { status: 400 });
+    }
+
+    const posts = readPosts();
     const formattedDate = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
     const newPost = {
       id: posts.length > 0 ? Math.max(...posts.map((p: any) => p.id)) + 1 : 1,
-      title: body.title,
-      excerpt: body.excerpt,
-      content: body.content,
-      category: body.category || 'Announcements',
-      author: body.author || (session.user?.name) || 'SAEBAJA Member',
+      title: body.title.trim().slice(0, 200),
+      excerpt: (body.excerpt || body.content.slice(0, 140) + '...').toString().trim().slice(0, 300),
+      content: body.content.trim().slice(0, 20000),
+      category: ['Announcements', 'Testing', 'AWIM Outreach', 'Competitions'].includes(body.category) 
+        ? body.category 
+        : 'Announcements',
+      author: session.user?.name || 'Harshit Kumar Mishra (President / Administrator)',
       date: formattedDate,
       lastUpdated: formattedDate,
       readTime: body.readTime || '3 min read'

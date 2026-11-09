@@ -6,11 +6,14 @@ import { authOptions } from '@/lib/auth';
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session || (session.user as any)?.role !== 'Admin') {
+      return NextResponse.json({ error: 'Unauthorized. Admin credentials required.' }, { status: 401 });
     }
     const { id } = await params;
     const { status } = await req.json();
+    if (!['Todo', 'In-Progress', 'Done'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid task status' }, { status: 400 });
+    }
     const task = await prisma.task.update({
       where: { id },
       data: { status }
@@ -24,7 +27,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'Admin') {
+    if (!session || (session.user as any)?.role !== 'Admin') {
       return NextResponse.json({ error: 'Forbidden. Only Admins can delete tasks.' }, { status: 403 });
     }
     const { id } = await params;

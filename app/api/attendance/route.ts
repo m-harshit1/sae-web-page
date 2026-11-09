@@ -19,15 +19,18 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session || (session.user as any)?.role !== 'Admin') {
+      return NextResponse.json({ error: 'Unauthorized. Admin credentials required.' }, { status: 401 });
     }
     const { name, hours, role } = await req.json();
+    if (!name || typeof name !== 'string' || !name.trim()) {
+      return NextResponse.json({ error: 'Valid member name is required' }, { status: 400 });
+    }
     const record = await prisma.attendanceRecord.create({
       data: {
-        name,
-        hours: parseFloat(hours),
-        role,
+        name: name.trim().slice(0, 100),
+        hours: Math.max(0, parseFloat(hours) || 0),
+        role: (role || 'Member').toString().trim().slice(0, 50),
         status: "Present"
       }
     });
