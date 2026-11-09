@@ -13,6 +13,13 @@ try {
     moved = true;
   }
 
+  // Clear stale .next dev types cache that might reference removed app/api routes
+  const dotNext = path.join(__dirname, '..', '.next');
+  if (fs.existsSync(dotNext)) {
+    fs.rmSync(dotNext, { recursive: true, force: true });
+    console.log('Cleaned stale .next cache directory.');
+  }
+
   console.log('Running Next.js static export build...');
   execSync('npx next build', {
     stdio: 'inherit',

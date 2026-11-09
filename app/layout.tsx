@@ -1,31 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
-
-/* ── Google Fonts ──────────────────────────────────────────────────────── */
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
-
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["700", "800", "900"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "700"],
-});
 
 /* ── SEO Metadata ──────────────────────────────────────────────────────── */
 export const metadata: Metadata = {
@@ -36,6 +13,7 @@ export const metadata: Metadata = {
     "SAEINDIA",
     "IIITDM Kurnool",
     "BAJA SAEINDIA",
+    "Team Monarch Racing",
     "AWIM Outreach",
     "Formula Student",
     "Aero Design",
@@ -76,10 +54,15 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`h-full antialiased ${inter.variable} ${montserrat.variable} ${jetbrainsMono.variable}`}
-    >
+    <html lang="en" className="h-full antialiased">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Montserrat:wght@700;800;900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-carbon-900 text-alloy-100 selection:bg-apex-red selection:text-white">
         <ScrollProgressBar />
         {/* Google Analytics */}
